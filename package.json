@@ -4,7 +4,7 @@
   "description": "media crawler",
   "main": "index.js",
   "scripts": {
-    "twitter": "ts-node ./src/twitter.ts"
+    "twitter": "webpack && node ./dist/main.js"
   },
   "repository": {
     "type": "git",
@@ -20,7 +20,12 @@
     "puppeteer": "^1.6.1"
   },
   "devDependencies": {
-    "ts-node": "^7.0.0",
-    "typescript": "^2.9.2"
+    "@types/puppeteer": "^1.5.1",
+    "babel-loader": "^7.1.5",
+    "ts-loader": "^4.4.2",
+    "typescript": "^2.9.2",
+    "webpack": "^4.16.3",
+    "webpack-cli": "^3.1.0",
+    "webpack-node-externals": "^1.7.2"
   }
 }
