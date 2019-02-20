@@ -43,6 +43,7 @@
       180
     ],
     "no-console": false,
+    "no-shadowed-variable": false,
     "jsx-no-multiline-js": false
   },
   "linterOptions": {

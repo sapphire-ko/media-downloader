@@ -4,7 +4,10 @@
   "description": "media downloader",
   "main": "index.js",
   "scripts": {
-    "twitter": "webpack && node ./dist/main.js"
+    "_build": "webpack",
+    "build:dev": "cross-env NODE_ENV=development npm run _build",
+    "build:prod": "cross-env NODE_ENV=production npm run _build",
+    "build": "npm run build:dev"
   },
   "repository": {
     "type": "git",
@@ -17,12 +20,14 @@
   },
   "homepage": "https://github.com/sapphiredev/media-downloader#readme",
   "dependencies": {
+    "puppeteer": "^1.12.2",
     "request": "^2.88.0",
     "twit": "^2.2.11"
   },
   "devDependencies": {
     "@types/knex": "^0.15.2",
     "@types/node": "^11.9.4",
+    "@types/puppeteer": "^1.12.1",
     "@types/request": "^2.48.1",
     "@types/twit": "^2.2.21",
     "babel-loader": "^7.1.5",
