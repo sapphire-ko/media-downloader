@@ -1,9 +1,8 @@
 import {
-	Puppeteer,
-} from '~/libs';
+	App,
+} from './App';
 
 (async () => {
-	Puppeteer.createInstance();
-	const puppeteer = Puppeteer.getInstance();
-	await puppeteer.initialize();
+	const app = new App();
+	await app.initialize();
 })();

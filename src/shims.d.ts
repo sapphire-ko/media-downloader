@@ -9,3 +9,9 @@ declare const __account: {
 	username: string;
 	password: string;
 };
+
+type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>;
+
+type AnyObject = {
+	[key: string]: string;
+};
