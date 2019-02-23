@@ -20,6 +20,7 @@ import {
 
 function getServiceType(payload: RequestPayload): ServiceType {
 	switch(payload.type) {
+		case RequestType.TWITTER_VERIFY_CREDENTIALS:
 		case RequestType.TWITTER_HOME_TIMELINE: {
 			return ServiceType.TWITTER;
 		}
@@ -51,6 +52,7 @@ function getHeaders(payload: RequestPayload): AnyObject {
 
 function getRequestMethod(payload: RequestPayload): RequestMethodType {
 	switch(payload.type) {
+		case RequestType.TWITTER_VERIFY_CREDENTIALS:
 		case RequestType.TWITTER_HOME_TIMELINE: {
 			return RequestMethodType.GET;
 		}
@@ -59,6 +61,9 @@ function getRequestMethod(payload: RequestPayload): RequestMethodType {
 
 function getURL(payload: RequestPayload): string {
 	switch(payload.type) {
+		case RequestType.TWITTER_VERIFY_CREDENTIALS: {
+			return `${API_URL_TWITTER}/account/verify_credentials.json`;
+		}
 		case RequestType.TWITTER_HOME_TIMELINE: {
 			const query = qs.stringify({
 				'count': '200',

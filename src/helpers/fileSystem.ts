@@ -19,3 +19,12 @@ export async function mkdir(dirPath: string) {
 		}
 	}
 }
+
+export async function readFile(filePath: string): Promise<string> {
+	const buffer = await fsPromises.readFile(filePath);
+	return buffer.toString();
+}
+
+export async function writeFile(filePath: string, data: string) {
+	await fsPromises.writeFile(filePath, data);
+}

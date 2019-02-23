@@ -1,7 +1,10 @@
 import {
-	ServiceType,
 	RequestType,
 } from '~/models';
+
+interface TwitterVerifyCredentialsPayload {
+	type: RequestType.TWITTER_VERIFY_CREDENTIALS;
+}
 
 interface TwitterHomeTimelinePayload {
 	type: RequestType.TWITTER_HOME_TIMELINE;
@@ -11,5 +14,6 @@ interface TwitterHomeTimelinePayload {
 }
 
 export type RequestPayload = (
+	| TwitterVerifyCredentialsPayload
 	| TwitterHomeTimelinePayload
 );

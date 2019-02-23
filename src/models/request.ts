@@ -1,5 +1,6 @@
 export enum RequestType {
-	TWITTER_HOME_TIMELINE = 100001,
+	TWITTER_VERIFY_CREDENTIALS = 100001,
+	TWITTER_HOME_TIMELINE,
 }
 
 export enum RequestMethodType {

@@ -5,14 +5,23 @@ import {
 
 import {
 	Puppeteer,
+	Twitter,
 } from '~/libs';
+
+import {
+	readFile,
+	writeFile,
+} from '~/helpers';
+
+type Configurations = {
+	[P in ServiceType]: Configuration | null;
+};
 
 export class Authentication {
 	private static instance: Authentication | null = null;
 
-	private configurations: {
-		[P in ServiceType]: Configuration | null;
-	};
+	private configurations: Configurations;
+	private filename = `${__path.data}/credentials.json`;
 
 	private constructor() {
 		this.configurations = {
@@ -35,12 +44,45 @@ export class Authentication {
 	}
 
 	public async initialize() {
+		try {
+			await this.import();
+		}
+		catch(error) {
+			console.log(`${this.filename} does not exist`);
+		}
+
+		let shouldExport = false;
+
 		{
 			const type = ServiceType.TWITTER;
 
-			const puppeteer = Puppeteer.getInstance();
-			this.configurations[type] = await puppeteer.login(type);
+			const twitter = Twitter.getInstance();
+			const isValid = await twitter.isValid();
+			if(isValid === false) {
+				this.configurations[type] = null;
+			}
+
+			if(this.configurations[type] === null) {
+				const puppeteer = Puppeteer.getInstance();
+				this.configurations[type] = await puppeteer.login(type);
+
+				shouldExport = true;
+			}
 		}
+
+		if(shouldExport === true) {
+			this.export();
+		}
+	}
+
+	private async import() {
+		const data = await readFile(this.filename);
+		this.configurations = JSON.parse(data);
+	}
+
+	private async export() {
+		const data = JSON.stringify(this.configurations);
+		await writeFile(this.filename, data);
 	}
 
 	public getConfiguration(type: ServiceType): Configuration {

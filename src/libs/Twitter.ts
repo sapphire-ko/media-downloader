@@ -36,16 +36,16 @@ export class Twitter {
 		const authentication = Authentication.getInstance();
 		authentication.getConfiguration(this.serviceType);
 
-		const data = await sendRequest({
-			'type': RequestType.TWITTER_HOME_TIMELINE,
-			'params': {
-				'since_id': '1099388585331937280',
-			},
-		});
+		try {
+			await sendRequest({
+				'type': RequestType.TWITTER_VERIFY_CREDENTIALS,
+			});
 
-		console.log(data);
-
-		return true;
+			return true;
+		}
+		catch(error) {
+			return false;
+		}
 	}
 
 	public async initialize() {
