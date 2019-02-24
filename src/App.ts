@@ -70,7 +70,7 @@ export class App {
 
 			await downloader.downloadMedia();
 
-			await sleep(60000);
+			await sleep(30000);
 		}
 		while(true);
 	}
