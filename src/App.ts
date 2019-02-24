@@ -54,18 +54,19 @@ export class App {
 
 		const downloader = Downloader.getInstance();
 
+		twitter.pushCommand({
+			'type': CommandType.TWITTER_FOLLOWING_IDS,
+		});
+		twitter.pushCommand({
+			'type': CommandType.TWITTER_RATE_LIMIT_STATUS,
+		});
+
 		do {
 			twitter.pushCommand({
 				'type': CommandType.TWITTER_HOME_TIMELINE,
 				'payload': {
 					'since_id': '',
 				},
-			});
-			twitter.pushCommand({
-				'type': CommandType.TWITTER_FOLLOWING_IDS,
-			});
-			twitter.pushCommand({
-				'type': CommandType.TWITTER_RATE_LIMIT_STATUS,
 			});
 
 			await downloader.downloadMedia();

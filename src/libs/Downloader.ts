@@ -101,7 +101,7 @@ export class Downloader {
 				});
 			}
 
-			await sleep(10);
+			await sleep(100);
 		}
 	}
 }

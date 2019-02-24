@@ -76,20 +76,6 @@ export class Twitter {
 				const status = await this.sendRequest({
 					'type': RequestType.TWITTER_RATE_LIMIT_STATUS,
 				}) as RateLimitStatus;
-
-				const a = status.resources.application['/application/rate_limit_status'];
-				const b = status.resources.statuses['/statuses/home_timeline'];
-				const c = Math.floor(Date.now() / 1000);
-				console.log(JSON.stringify({
-					'rate_limit': {
-						'a': a.remaining,
-						'b': (a.reset - c) / 60,
-					},
-					'home': {
-						'a': b.remaining,
-						'b': (b.reset - c) / 60,
-					},
-				}, null, 1));
 				return true;
 			}
 			case CommandType.TWITTER_FOLLOWING_IDS: {
