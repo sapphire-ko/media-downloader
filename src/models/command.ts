@@ -5,6 +5,7 @@ export enum CommandType {
 	DATABASE_INSERT_ACCOUNT = 200001,
 	DATABASE_INSERT_TWEET,
 	DATABASE_INSERT_MEDIUM,
+	DOWNLOADER_DOWNLOAD_MEDIA = 300001,
 }
 
 interface CommandTwitterRateLimitStatus {
@@ -48,6 +49,7 @@ export interface CommandDatabaseInsertMedium {
 	payload: {
 		id: string;
 		url: string;
+		accountId: string;
 		tweetId: string;
 	};
 }
@@ -58,7 +60,16 @@ export type CommandDatabase = (
 	| CommandDatabaseInsertMedium
 );
 
+interface CommandDownloaderDownloadMedia {
+	type: CommandType.DOWNLOADER_DOWNLOAD_MEDIA;
+}
+
+export type CommandDownloader = (
+	| CommandDownloaderDownloadMedia
+);
+
 export type Command = (
 	| CommandTwitter
 	| CommandDatabase
+	| CommandDownloader
 );

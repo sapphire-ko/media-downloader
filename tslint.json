@@ -32,10 +32,7 @@
     "class-name": false,
     "variable-name": [
       true,
-      "ban-keywords",
-      "check-format",
-      "allow-pascal-case",
-      "allow-snake-case"
+      "ban-keywords"
     ],
     "no-namespace": false,
     "max-line-length": [

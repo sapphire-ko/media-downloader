@@ -125,42 +125,47 @@ export class Twitter {
 							'accountId': tweet.user.id_str,
 						},
 					});
-					if(tweet.extended_entities !== undefined) {
-						const {
-							extended_entities: entities,
-						} = tweet;
+					if(tweet.retweeted_status !== undefined) {
+						continue;
+					}
+					if(tweet.extended_entities === undefined) {
+						continue;
+					}
+					const {
+						extended_entities: entities,
+					} = tweet;
 
-						for(const medium of entities.media) {
-							let id: string | null = null;
-							let url: string | null = null;
+					for(const medium of entities.media) {
+						let id: string | null = null;
+						let url: string | null = null;
 
-							switch(medium.type) {
-								case TwitterMediumType.PHOTO: {
-									id = medium.id_str;
-									url = `${medium.media_url_https}:orig`;
-									break;
-								}
-								case TwitterMediumType.VIDEO: {
-									id = medium.id_str;
-									url = medium.video_info.variants.filter((e) => {
-										return e.content_type.startsWith('video');
-									}).sort((a, b) => {
-										return a.bitrate - b.bitrate;
-									})[0].url;
-									break;
-								}
+						switch(medium.type) {
+							case TwitterMediumType.PHOTO: {
+								id = medium.id_str;
+								url = `${medium.media_url_https}:orig`;
+								break;
 							}
-
-							if(id !== null && url !== null) {
-								database.pushCommand({
-									'type': CommandType.DATABASE_INSERT_MEDIUM,
-									'payload': {
-										'id': id,
-										'url': url,
-										'tweetId': tweet.id_str,
-									},
-								});
+							case TwitterMediumType.VIDEO: {
+								id = medium.id_str;
+								url = medium.video_info.variants.filter((e) => {
+									return e.content_type.startsWith('video');
+								}).sort((a, b) => {
+									return a.bitrate - b.bitrate;
+								})[0].url;
+								break;
 							}
+						}
+
+						if(id !== null && url !== null) {
+							database.pushCommand({
+								'type': CommandType.DATABASE_INSERT_MEDIUM,
+								'payload': {
+									'id': id,
+									'url': url,
+									'accountId': tweet.user.id_str,
+									'tweetId': tweet.id_str,
+								},
+							});
 						}
 					}
 				}

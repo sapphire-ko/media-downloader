@@ -1,4 +1,7 @@
+import url from 'url';
+
 import knex from 'knex';
+import qs from 'qs';
 
 import {
 	TableName,
@@ -46,7 +49,7 @@ export class Database {
 		const exists = await this.knex.schema.hasTable(tableName);
 		if(exists === false) {
 			await this.knex.schema.createTable(tableName, (table) => {
-				table.bigInteger('id').unique();
+				table.string('id').unique();
 
 				switch(tableName) {
 					case TableName.TWITTER_ACCOUNTS: {
@@ -54,13 +57,15 @@ export class Database {
 						break;
 					}
 					case TableName.TWITTER_TWEETS: {
-						table.bigInteger('account_id').notNullable();
+						table.string('account_id').notNullable();
 						break;
 					}
 					case TableName.TWITTER_MEDIA: {
-						table.bigInteger('tweet_id').notNullable();
+						table.string('account_id').notNullable();
+						table.string('tweet_id').notNullable();
 						table.string('url').notNullable();
 						table.boolean('downloaded').notNullable();
+						table.integer('retry_count').notNullable();
 						break;
 					}
 				}
@@ -141,6 +146,7 @@ export class Database {
 		const {
 			id,
 			url,
+			accountId,
 			tweetId,
 		} = params;
 
@@ -150,10 +156,48 @@ export class Database {
 			await this.knex(TableName.TWITTER_MEDIA).insert({
 				'id': id,
 				'url': url,
+				'account_id': accountId,
 				'tweet_id': tweetId,
 				'downloaded': false,
+				'retry_count': 0,
 			});
 		}
+	}
+
+	public async getMedia(): Promise<Array<{
+		id: string;
+		url: string;
+		account_id: string;
+		tweet_id: string;
+		downloaded: boolean;
+		retry_count: number;
+	}>> {
+		const rows = await this.knex(TableName.TWITTER_MEDIA).where({
+			'downloaded': false,
+		});
+
+		return rows.filter((row: any) => {
+			return row.retry_count < 10;
+		});
+	}
+
+	public async updateMedium(params: {
+		id: string;
+		downloaded: boolean;
+		retryCount: number;
+	}) {
+		const {
+			id,
+			downloaded,
+			retryCount,
+		} = params;
+
+		await this.knex(TableName.TWITTER_MEDIA).where({
+			'id': id,
+		}).update({
+			'downloaded': downloaded,
+			'retry_count': retryCount,
+		});
 	}
 
 	public async start() {

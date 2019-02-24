@@ -5,6 +5,7 @@ import {
 import {
 	Authentication,
 	Database,
+	Downloader,
 	Puppeteer,
 	Twitter,
 } from '~/libs';
@@ -38,6 +39,10 @@ export class App {
 			const authentication = Authentication.getInstance();
 			await authentication.initialize();
 		}
+
+		{
+			Downloader.createInstance();
+		}
 	}
 
 	public async start() {
@@ -46,6 +51,8 @@ export class App {
 
 		const twitter = Twitter.getInstance();
 		twitter.start();
+
+		const downloader = Downloader.getInstance();
 
 		do {
 			twitter.pushCommand({
@@ -60,6 +67,8 @@ export class App {
 			twitter.pushCommand({
 				'type': CommandType.TWITTER_RATE_LIMIT_STATUS,
 			});
+
+			await downloader.downloadMedia();
 
 			await sleep(60000);
 		}
