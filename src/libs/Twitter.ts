@@ -1,5 +1,7 @@
 import {
 	ServiceType,
+	CommandType,
+	CommandTwitter,
 	RequestType,
 } from '~/models';
 
@@ -8,11 +10,15 @@ import {
 } from '~/libs';
 
 import {
+	sleep,
 	sendRequest,
 } from '~/helpers';
 
 export class Twitter {
 	private static instance: Twitter | null = null;
+
+	private queue: CommandTwitter[] = [];
+	private shouldProcess = false;
 
 	private serviceType = ServiceType.TWITTER;
 
@@ -32,6 +38,29 @@ export class Twitter {
 		return this.instance;
 	}
 
+	public async initialize() {
+		this.shouldProcess = true;
+	}
+
+	public async start() {
+		do {
+			await sleep(1000);
+
+			if(this.queue.length === 0) {
+				continue;
+			}
+
+			const command = this.queue.shift()!;
+
+			await this.process(command);
+		}
+		while(this.shouldProcess);
+	}
+
+	private async process(command: CommandTwitter) {
+		console.log(command);
+	}
+
 	public async isValid(): Promise<boolean> {
 		const authentication = Authentication.getInstance();
 		authentication.getConfiguration(this.serviceType);
@@ -46,9 +75,5 @@ export class Twitter {
 		catch(error) {
 			return false;
 		}
-	}
-
-	public async initialize() {
-		await this.isValid();
 	}
 }

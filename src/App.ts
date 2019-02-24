@@ -1,11 +1,18 @@
 import {
 	Authentication,
+	Database,
 	Puppeteer,
 	Twitter,
 } from '~/libs';
 
 export class App {
 	public async initialize() {
+		{
+			Database.createInstance();
+			const database = Database.getInstance();
+			await database.initialize();
+		}
+
 		{
 			Puppeteer.createInstance();
 			const puppeteer = Puppeteer.getInstance();

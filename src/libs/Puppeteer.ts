@@ -77,7 +77,7 @@ export class Puppeteer {
 				const {
 					username,
 					password,
-				} = __account;
+				} = __account.twitter;
 
 				await this.waitElement(page, '.js-username-field');
 				await this.waitElement(page, '.js-password-field');

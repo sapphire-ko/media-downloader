@@ -5,9 +5,12 @@ declare const __path: {
 	dist: string;
 	data: string;
 };
+declare const __knex: any;
 declare const __account: {
-	username: string;
-	password: string;
+	twitter: {
+		username: string;
+		password: string;
+	};
 };
 
 type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>;
