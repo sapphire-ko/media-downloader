@@ -3,9 +3,14 @@ import {
 } from '~/models';
 
 export enum CommandType {
-	TWITTER_HOME_TIMELINE = 100001,
+	TWITTER_RATE_LIMIT_STATUS = 100001,
+	TWITTER_HOME_TIMELINE,
 	DATABASE_INSERT_TWEET = 200001,
 	DATABASE_UPDATE_TWEET,
+}
+
+interface CommandTwitterRateLimitStatus {
+	type: CommandType.TWITTER_RATE_LIMIT_STATUS;
 }
 
 interface CommandTwitterHomeTimeline {
@@ -16,6 +21,7 @@ interface CommandTwitterHomeTimeline {
 }
 
 export type CommandTwitter = (
+	| CommandTwitterRateLimitStatus
 	| CommandTwitterHomeTimeline
 );
 

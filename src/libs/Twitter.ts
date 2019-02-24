@@ -3,10 +3,14 @@ import {
 	CommandType,
 	CommandTwitter,
 	RequestType,
+	Tweet,
+	RequestPayloadTwitter,
+	RateLimitStatus,
 } from '~/models';
 
 import {
 	Authentication,
+	Database,
 } from '~/libs';
 
 import {
@@ -42,6 +46,10 @@ export class Twitter {
 		this.shouldProcess = true;
 	}
 
+	public pushCommand(command: CommandTwitter) {
+		this.queue.push(command);
+	}
+
 	public async start() {
 		do {
 			await sleep(1000);
@@ -57,8 +65,45 @@ export class Twitter {
 		while(this.shouldProcess);
 	}
 
+	public async stop() {
+		this.shouldProcess = false;
+	}
+
 	private async process(command: CommandTwitter) {
-		console.log(command);
+		switch(command.type) {
+			case CommandType.TWITTER_RATE_LIMIT_STATUS: {
+				const status = await this.sendRequest({
+					'type': RequestType.TWITTER_RATE_LIMIT_STATUS,
+				}) as RateLimitStatus;
+
+				break;
+			}
+			case CommandType.TWITTER_HOME_TIMELINE: {
+				const tweets = await this.sendRequest({
+					'type': RequestType.TWITTER_HOME_TIMELINE,
+					'params': command.payload,
+				}) as Tweet[];
+
+				for(const tweet of tweets) {
+					const database = Database.getInstance();
+					database.pushCommand({
+						'type': CommandType.DATABASE_INSERT_TWEET,
+						'payload': {
+							'tweet': tweet,
+						},
+					});
+				}
+
+				break;
+			}
+		}
+	}
+
+	private async sendRequest(payload: RequestPayloadTwitter) {
+		const authentication = Authentication.getInstance();
+		authentication.getConfiguration(this.serviceType);
+
+		return sendRequest(payload);
 	}
 
 	public async isValid(): Promise<boolean> {
@@ -66,7 +111,7 @@ export class Twitter {
 		authentication.getConfiguration(this.serviceType);
 
 		try {
-			await sendRequest({
+			this.sendRequest({
 				'type': RequestType.TWITTER_VERIFY_CREDENTIALS,
 			});
 

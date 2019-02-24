@@ -47,7 +47,7 @@ module.exports = {
 			return Object.assign(a, b);
 		}, {})),
 	],
-	'devtool': false,
+	'devtool': 'source-map',
 	'resolve': {
 		'extensions': [
 			'.ts',

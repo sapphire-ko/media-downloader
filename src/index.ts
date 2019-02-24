@@ -3,6 +3,12 @@ import {
 } from './App';
 
 (async () => {
-	const app = new App();
-	await app.initialize();
+	try {
+		const app = new App();
+		await app.initialize();
+		app.start();
+	}
+	catch(error) {
+		console.log(error);
+	}
 })();

@@ -21,6 +21,7 @@ import {
 function getServiceType(payload: RequestPayload): ServiceType {
 	switch(payload.type) {
 		case RequestType.TWITTER_VERIFY_CREDENTIALS:
+		case RequestType.TWITTER_RATE_LIMIT_STATUS:
 		case RequestType.TWITTER_HOME_TIMELINE: {
 			return ServiceType.TWITTER;
 		}
@@ -53,6 +54,7 @@ function getHeaders(payload: RequestPayload): AnyObject {
 function getRequestMethod(payload: RequestPayload): RequestMethodType {
 	switch(payload.type) {
 		case RequestType.TWITTER_VERIFY_CREDENTIALS:
+		case RequestType.TWITTER_RATE_LIMIT_STATUS:
 		case RequestType.TWITTER_HOME_TIMELINE: {
 			return RequestMethodType.GET;
 		}
@@ -64,8 +66,11 @@ function getURL(payload: RequestPayload): string {
 		case RequestType.TWITTER_VERIFY_CREDENTIALS: {
 			return `${API_URL_TWITTER}/account/verify_credentials.json`;
 		}
+		case RequestType.TWITTER_RATE_LIMIT_STATUS: {
+			return `${API_URL_TWITTER}/application/rate_limit_status.json`;
+		}
 		case RequestType.TWITTER_HOME_TIMELINE: {
-			const query = qs.stringify({
+			const params: any = {
 				'count': '200',
 				'include_my_retweet': '1',
 				'cards_platform': 'Web-13',
@@ -76,8 +81,11 @@ function getURL(payload: RequestPayload): string {
 				'tweet_mode': 'extended',
 				'include_ext_alt_text': 'true',
 				'include_reply_count': 'true',
-				...payload.params,
-			});
+			};
+			if(payload.params.since_id !== '') {
+				params.since_id = payload.params.since_id;
+			}
+			const query = qs.stringify(params);
 			return `${API_URL_TWITTER}/statuses/home_timeline.json?${query}`;
 		}
 	}
@@ -89,6 +97,8 @@ export async function sendRequest(payload: RequestPayload): Promise<any> {
 	const url = getURL(payload);
 
 	let response: Response | null = null;
+
+	console.info(payload);
 
 	switch(methodType) {
 		case RequestMethodType.GET: {
@@ -121,6 +131,6 @@ export async function sendRequest(payload: RequestPayload): Promise<any> {
 		return data;
 	}
 	catch(error) {
-		throw error;
+		console.log(error);
 	}
 }

@@ -41,9 +41,9 @@ export class Database {
 	}
 
 	private async createTable<T extends TableName>(tableName: T) {
-		const exists = await this.knex(tableName);
+		const exists = await this.knex.schema.hasTable(tableName);
 		if(exists === false) {
-			this.knex.schema.createTable(tableName, (table) => {
+			await this.knex.schema.createTable(tableName, (table) => {
 				table.bigInteger('id').unique();
 
 				switch(tableName) {
@@ -95,7 +95,7 @@ export class Database {
 
 	public async start() {
 		do {
-			await sleep(1000);
+			await sleep(10);
 
 			if(this.queue.length === 0) {
 				continue;
@@ -106,6 +106,10 @@ export class Database {
 			await this.process(command);
 		}
 		while(this.shouldProcess);
+	}
+
+	public async stop() {
+		this.shouldProcess = false;
 	}
 
 	private async process(command: CommandDatabase) {
