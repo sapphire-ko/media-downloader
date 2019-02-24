@@ -55,6 +55,9 @@ export class App {
 				},
 			});
 			twitter.pushCommand({
+				'type': CommandType.TWITTER_FOLLOWING_IDS,
+			});
+			twitter.pushCommand({
 				'type': CommandType.TWITTER_RATE_LIMIT_STATUS,
 			});
 

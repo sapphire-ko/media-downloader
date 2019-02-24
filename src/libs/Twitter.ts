@@ -3,6 +3,7 @@ import {
 	CommandType,
 	CommandTwitter,
 	RequestType,
+	AccountTwitter,
 	Tweet,
 	RequestPayloadTwitter,
 	RateLimitStatus,
@@ -69,32 +70,49 @@ export class Twitter {
 		this.shouldProcess = false;
 	}
 
-	private async process(command: CommandTwitter) {
+	private async process(command: CommandTwitter): Promise<true> {
 		switch(command.type) {
 			case CommandType.TWITTER_RATE_LIMIT_STATUS: {
 				const status = await this.sendRequest({
 					'type': RequestType.TWITTER_RATE_LIMIT_STATUS,
 				}) as RateLimitStatus;
-
-				break;
+				return true;
+			}
+			case CommandType.TWITTER_FOLLOWING_IDS: {
+				const {
+					ids,
+				} = await this.sendRequest({
+					'type': RequestType.TWITTER_FOLLOWING_IDS,
+				}) as {
+					ids: string[];
+				};
+				for(const id of ids) {
+					const database = Database.getInstance();
+					database.pushCommand({
+						'type': CommandType.DATABASE_INSERT_ACCOUNT,
+						'payload': {
+							'id': id,
+						},
+					});
+				}
+				return true;
 			}
 			case CommandType.TWITTER_HOME_TIMELINE: {
 				const tweets = await this.sendRequest({
 					'type': RequestType.TWITTER_HOME_TIMELINE,
 					'params': command.payload,
 				}) as Tweet[];
-
 				for(const tweet of tweets) {
 					const database = Database.getInstance();
 					database.pushCommand({
 						'type': CommandType.DATABASE_INSERT_TWEET,
 						'payload': {
-							'tweet': tweet,
+							'id': tweet.id_str,
+							'hasMedia': false,
 						},
 					});
 				}
-
-				break;
+				return true;
 			}
 		}
 	}

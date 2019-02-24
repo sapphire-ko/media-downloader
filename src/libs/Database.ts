@@ -7,7 +7,8 @@ import {
 import {
 	CommandType,
 	CommandDatabase,
-	Tweet,
+	CommandDatabaseInsertAccount,
+	CommandDatabaseInsertTweet,
 } from '~/models';
 
 import {
@@ -48,6 +49,7 @@ export class Database {
 
 				switch(tableName) {
 					case TableName.TWITTER_ACCOUNTS: {
+						table.string('alias');
 						break;
 					}
 					case TableName.TWITTER_TWEETS: {
@@ -73,21 +75,49 @@ export class Database {
 		this.queue.push(command);
 	}
 
-	private async hasTweet(tweet: Tweet): Promise<boolean> {
-		const rows = await this.knex(TableName.TWITTER_TWEETS).where({
-			'id': tweet.id_str,
+	private async hasAccount(id: string): Promise<boolean> {
+		const rows = await this.knex(TableName.TWITTER_ACCOUNTS).where({
+			'id': id,
 		});
 
 		return rows.length > 0;
 	}
 
-	private async insertTweet(tweet: Tweet) {
-		const hasTweet = await this.hasTweet(tweet);
+	private async insertAccount(payload: CommandDatabaseInsertAccount['payload']) {
+		const {
+			id,
+		} = payload;
+
+		const hasAccount = await this.hasAccount(id);
+
+		if(hasAccount === false) {
+			await this.knex(TableName.TWITTER_ACCOUNTS).insert({
+				'id': id,
+				'alias': '',
+			});
+		}
+	}
+
+	private async hasTweet(id: string): Promise<boolean> {
+		const rows = await this.knex(TableName.TWITTER_TWEETS).where({
+			'id': id,
+		});
+
+		return rows.length > 0;
+	}
+
+	private async insertTweet(params: CommandDatabaseInsertTweet['payload']) {
+		const {
+			id,
+			hasMedia,
+		} = params;
+
+		const hasTweet = await this.hasTweet(id);
 
 		if(hasTweet === false) {
 			await this.knex(TableName.TWITTER_TWEETS).insert({
-				'id': tweet.id_str,
-				'hasMedia': '',
+				'id': id,
+				'hasMedia': hasMedia,
 				'downloaded': false,
 			});
 		}
@@ -112,16 +142,21 @@ export class Database {
 		this.shouldProcess = false;
 	}
 
-	private async process(command: CommandDatabase) {
+	private async process(command: CommandDatabase): Promise<true> {
 		switch(command.type) {
+			case CommandType.DATABASE_INSERT_ACCOUNT: {
+				this.insertAccount(command.payload);
+				return true;
+			}
+			case CommandType.DATABASE_UPDATE_ACCOUNT: {
+				return true;
+			}
 			case CommandType.DATABASE_INSERT_TWEET: {
-				const {
-					payload,
-				} = command;
-
-				this.insertTweet(payload.tweet);
-
-				break;
+				this.insertTweet(command.payload);
+				return true;
+			}
+			case CommandType.DATABASE_UPDATE_TWEET: {
+				return true;
 			}
 		}
 	}

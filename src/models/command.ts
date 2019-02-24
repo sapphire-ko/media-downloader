@@ -1,16 +1,19 @@
-import {
-	Tweet,
-} from '~/models';
-
 export enum CommandType {
 	TWITTER_RATE_LIMIT_STATUS = 100001,
+	TWITTER_FOLLOWING_IDS,
 	TWITTER_HOME_TIMELINE,
-	DATABASE_INSERT_TWEET = 200001,
+	DATABASE_INSERT_ACCOUNT = 200001,
+	DATABASE_UPDATE_ACCOUNT,
+	DATABASE_INSERT_TWEET,
 	DATABASE_UPDATE_TWEET,
 }
 
 interface CommandTwitterRateLimitStatus {
 	type: CommandType.TWITTER_RATE_LIMIT_STATUS;
+}
+
+interface CommandTwitterFollowingIDs {
+	type: CommandType.TWITTER_FOLLOWING_IDS;
 }
 
 interface CommandTwitterHomeTimeline {
@@ -22,24 +25,43 @@ interface CommandTwitterHomeTimeline {
 
 export type CommandTwitter = (
 	| CommandTwitterRateLimitStatus
+	| CommandTwitterFollowingIDs
 	| CommandTwitterHomeTimeline
 );
 
-interface CommandDatabaseInsertTweet {
-	type: CommandType.DATABASE_INSERT_TWEET;
+export interface CommandDatabaseInsertAccount {
+	type: CommandType.DATABASE_INSERT_ACCOUNT;
 	payload: {
-		tweet: Tweet;
+		id: string;
 	};
 }
 
-interface CommandDatabaseUpdateTweet {
+export interface CommandDatabaseUpdateAccount {
+	type: CommandType.DATABASE_UPDATE_ACCOUNT;
+	payload: {
+		id: string;
+	};
+}
+
+export interface CommandDatabaseInsertTweet {
+	type: CommandType.DATABASE_INSERT_TWEET;
+	payload: {
+		id: string;
+		hasMedia: boolean;
+	};
+}
+
+export interface CommandDatabaseUpdateTweet {
 	type: CommandType.DATABASE_UPDATE_TWEET;
 	payload: {
-		tweet: Tweet;
+		id: string;
+		downloaded: boolean;
 	};
 }
 
 export type CommandDatabase = (
+	| CommandDatabaseInsertAccount
+	| CommandDatabaseUpdateAccount
 	| CommandDatabaseInsertTweet
 	| CommandDatabaseUpdateTweet
 );

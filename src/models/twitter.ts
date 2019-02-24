@@ -2,6 +2,7 @@ import {
 	Twitter,
 } from 'twit';
 
+export type AccountTwitter = Twitter.User;
 export type Tweet = Twitter.Status;
 
 interface LimitStatus {

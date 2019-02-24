@@ -153,7 +153,8 @@ export class Puppeteer {
 		await mkdir(__path.data);
 
 		this.browser = await puppeteer.launch({
-			'headless': __dev ? false : true,
+			// 'headless': __dev ? false : true,
+			'headless': true,
 			'args': [
 				'--no-sandbox',
 			],
