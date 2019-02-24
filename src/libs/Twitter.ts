@@ -3,8 +3,8 @@ import {
 	CommandType,
 	CommandTwitter,
 	RequestType,
-	AccountTwitter,
 	Tweet,
+	TwitterMediumType,
 	RequestPayloadTwitter,
 	RateLimitStatus,
 } from '~/models';
@@ -76,6 +76,20 @@ export class Twitter {
 				const status = await this.sendRequest({
 					'type': RequestType.TWITTER_RATE_LIMIT_STATUS,
 				}) as RateLimitStatus;
+
+				const a = status.resources.application['/application/rate_limit_status'];
+				const b = status.resources.statuses['/statuses/home_timeline'];
+				const c = Math.floor(Date.now() / 1000);
+				console.log(JSON.stringify({
+					'rate_limit': {
+						'a': a.remaining,
+						'b': (a.reset - c) / 60,
+					},
+					'home': {
+						'a': b.remaining,
+						'b': (b.reset - c) / 60,
+					},
+				}, null, 1));
 				return true;
 			}
 			case CommandType.TWITTER_FOLLOWING_IDS: {
@@ -108,9 +122,47 @@ export class Twitter {
 						'type': CommandType.DATABASE_INSERT_TWEET,
 						'payload': {
 							'id': tweet.id_str,
-							'hasMedia': false,
+							'accountId': tweet.user.id_str,
 						},
 					});
+					if(tweet.extended_entities !== undefined) {
+						const {
+							extended_entities: entities,
+						} = tweet;
+
+						for(const medium of entities.media) {
+							let id: string | null = null;
+							let url: string | null = null;
+
+							switch(medium.type) {
+								case TwitterMediumType.PHOTO: {
+									id = medium.id_str;
+									url = `${medium.media_url_https}:orig`;
+									break;
+								}
+								case TwitterMediumType.VIDEO: {
+									id = medium.id_str;
+									url = medium.video_info.variants.filter((e) => {
+										return e.content_type.startsWith('video');
+									}).sort((a, b) => {
+										return a.bitrate - b.bitrate;
+									})[0].url;
+									break;
+								}
+							}
+
+							if(id !== null && url !== null) {
+								database.pushCommand({
+									'type': CommandType.DATABASE_INSERT_MEDIUM,
+									'payload': {
+										'id': id,
+										'url': url,
+										'tweetId': tweet.id_str,
+									},
+								});
+							}
+						}
+					}
 				}
 				return true;
 			}

@@ -61,7 +61,7 @@ export class App {
 				'type': CommandType.TWITTER_RATE_LIMIT_STATUS,
 			});
 
-			await sleep(15000);
+			await sleep(60000);
 		}
 		while(true);
 	}

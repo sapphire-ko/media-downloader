@@ -3,9 +3,8 @@ export enum CommandType {
 	TWITTER_FOLLOWING_IDS,
 	TWITTER_HOME_TIMELINE,
 	DATABASE_INSERT_ACCOUNT = 200001,
-	DATABASE_UPDATE_ACCOUNT,
 	DATABASE_INSERT_TWEET,
-	DATABASE_UPDATE_TWEET,
+	DATABASE_INSERT_MEDIUM,
 }
 
 interface CommandTwitterRateLimitStatus {
@@ -36,34 +35,27 @@ export interface CommandDatabaseInsertAccount {
 	};
 }
 
-export interface CommandDatabaseUpdateAccount {
-	type: CommandType.DATABASE_UPDATE_ACCOUNT;
-	payload: {
-		id: string;
-	};
-}
-
 export interface CommandDatabaseInsertTweet {
 	type: CommandType.DATABASE_INSERT_TWEET;
 	payload: {
 		id: string;
-		hasMedia: boolean;
+		accountId: string;
 	};
 }
 
-export interface CommandDatabaseUpdateTweet {
-	type: CommandType.DATABASE_UPDATE_TWEET;
+export interface CommandDatabaseInsertMedium {
+	type: CommandType.DATABASE_INSERT_MEDIUM;
 	payload: {
 		id: string;
-		downloaded: boolean;
+		url: string;
+		tweetId: string;
 	};
 }
 
 export type CommandDatabase = (
 	| CommandDatabaseInsertAccount
-	| CommandDatabaseUpdateAccount
 	| CommandDatabaseInsertTweet
-	| CommandDatabaseUpdateTweet
+	| CommandDatabaseInsertMedium
 );
 
 export type Command = (

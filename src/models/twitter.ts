@@ -2,8 +2,37 @@ import {
 	Twitter,
 } from 'twit';
 
+export enum TwitterMediumType {
+	PHOTO = 'photo',
+	VIDEO = 'video',
+}
+
+interface TwitterMediumPhoto {
+	type: TwitterMediumType.PHOTO;
+}
+
+interface TwitterMediumVideo {
+	type: TwitterMediumType.VIDEO;
+	video_info: {
+		variants: Array<{
+			bitrate: number;
+			content_type: string;
+			url: string;
+		}>;
+	};
+}
+
+type TwitterMedium = (
+	| TwitterMediumPhoto
+	| TwitterMediumVideo
+);
+
 export type AccountTwitter = Twitter.User;
-export type Tweet = Twitter.Status;
+export type Tweet = Twitter.Status & {
+	extended_entities?: {
+		media: Array<Twitter.MediaEntity & TwitterMedium>;
+	};
+};
 
 interface LimitStatus {
 	limit: number;
