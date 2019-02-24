@@ -150,8 +150,6 @@ export class Puppeteer {
 	}
 
 	public async initialize() {
-		await mkdir(__path.data);
-
 		this.browser = await puppeteer.launch({
 			// 'headless': __dev ? false : true,
 			'headless': true,

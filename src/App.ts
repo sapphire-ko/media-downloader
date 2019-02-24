@@ -11,11 +11,14 @@ import {
 } from '~/libs';
 
 import {
+	mkdir,
 	sleep,
 } from './helpers';
 
 export class App {
 	public async initialize() {
+		await mkdir(__path.data);
+
 		{
 			Database.createInstance();
 			const database = Database.getInstance();
