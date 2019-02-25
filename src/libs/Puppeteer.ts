@@ -132,8 +132,11 @@ export class Puppeteer {
 					return (window as any).TD.config.bearer_token;
 				}) as string;
 
-				const cookie = (await page.cookies()).map((cookie) => {
-					return `${cookie.name}="${cookie.value}"`;
+				const cookies = await page.cookies();
+				const cookie = cookies.filter((cookie) => {
+					return cookie.domain === '.twitter.com';
+				}).map((cookie) => {
+					return `${cookie.name}=${cookie.value}`;
 				}).join('; ');
 
 				await page.close();
@@ -142,7 +145,9 @@ export class Puppeteer {
 					'type': ServiceType.TWITTER,
 					'userAgent': userAgent,
 					'bearerToken': bearerToken,
-					'csrfToken': cookie.match(/ct0="(.+?)";/i)![1],
+					'csrfToken': cookies.find((cookie) => {
+						return cookie.name === 'ct0';
+					})!.value,
 					'cookie': cookie,
 				};
 			}

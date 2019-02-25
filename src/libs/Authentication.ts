@@ -56,17 +56,17 @@ export class Authentication {
 		{
 			const type = ServiceType.TWITTER;
 
-			const twitter = Twitter.getInstance();
-			const isValid = await twitter.isValid();
-			if(isValid === false) {
-				this.configurations[type] = null;
-			}
-
 			if(this.configurations[type] === null) {
 				const puppeteer = Puppeteer.getInstance();
 				this.configurations[type] = await puppeteer.login(type);
 
 				shouldExport = true;
+			}
+
+			const twitter = Twitter.getInstance();
+			const isValid = await twitter.isValid();
+			if(isValid === false) {
+				this.configurations[type] = null;
 			}
 		}
 
