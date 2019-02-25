@@ -61,7 +61,13 @@ export class Twitter {
 
 			const command = this.queue.shift()!;
 
-			await this.process(command);
+			try {
+				await this.process(command);
+			}
+			catch(error) {
+				console.log(error);
+				this.queue.unshift(command);
+			}
 		}
 		while(this.shouldProcess);
 	}
