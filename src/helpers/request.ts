@@ -106,32 +106,32 @@ export async function sendRequest(payload: RequestPayload): Promise<any> {
 	const methodType = getRequestMethod(payload);
 	const url = getURL(payload);
 
-	let response: Response | null = null;
-
 	console.info(payload);
 
-	switch(methodType) {
-		case RequestMethodType.GET: {
-			response = await fetch(url, {
-				'method': 'get',
-				'headers': headers,
-			});
-			break;
-		}
-		case RequestMethodType.POST: {
-			response = await fetch(url, {
-				'method': 'post',
-				'headers': headers,
-			});
-			break;
-		}
-	}
-
-	if(response === null) {
-		throw new Error('failed to send request');
-	}
-
 	try {
+		let response: Response | null = null;
+
+		switch(methodType) {
+			case RequestMethodType.GET: {
+				response = await fetch(url, {
+					'method': 'get',
+					'headers': headers,
+				});
+				break;
+			}
+			case RequestMethodType.POST: {
+				response = await fetch(url, {
+					'method': 'post',
+					'headers': headers,
+				});
+				break;
+			}
+		}
+
+		if(response === null) {
+			throw new Error('failed to send request');
+		}
+
 		const data = await response.json();
 
 		if(response.status !== 200) {
