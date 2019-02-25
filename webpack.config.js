@@ -13,10 +13,15 @@ const dataPath = path.resolve(rootPath, 'data');
 const __env = require('./env.json');
 
 module.exports = {
-	'entry': path.resolve(srcPath, 'index.ts'),
+	'entry': {
+		// 'main': path.resolve(srcPath, 'index.ts'),
+		// 'fetch': path.resolve(srcPath, 'fetch.ts'),
+		'user': path.resolve(srcPath, 'user.ts'),
+		// 'download': path.resolve(srcPath, 'download.ts'),
+	},
 	'output': {
 		'path': distPath,
-		'filename': 'main.js',
+		'filename': '[name].js',
 	},
 	'module': {
 		'rules': [
