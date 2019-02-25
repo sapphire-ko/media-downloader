@@ -10,8 +10,15 @@ interface TwitterRateLimitStatusPayload {
 	type: RequestType.TWITTER_RATE_LIMIT_STATUS;
 }
 
-interface TwitterFollowingIDsPayload {
+interface TwitterFollowingIdsPayload {
 	type: RequestType.TWITTER_FOLLOWING_IDS;
+}
+
+interface TwitterFollowingListPayload {
+	type: RequestType.TWITTER_FOLLOWING_LIST;
+	params: {
+		cursor: string;
+	};
 }
 
 interface TwitterHomeTimelinePayload {
@@ -21,11 +28,21 @@ interface TwitterHomeTimelinePayload {
 	};
 }
 
+interface TwitterUserTimelinePayload {
+	type: RequestType.TWITTER_USER_TIMELINE;
+	params: {
+		user_id: string;
+		max_id: string;
+	};
+}
+
 export type RequestPayloadTwitter = (
 	| TwitterVerifyCredentialsPayload
 	| TwitterRateLimitStatusPayload
-	| TwitterFollowingIDsPayload
+	| TwitterFollowingIdsPayload
+	| TwitterFollowingListPayload
 	| TwitterHomeTimelinePayload
+	| TwitterUserTimelinePayload
 );
 
 export type RequestPayload = (

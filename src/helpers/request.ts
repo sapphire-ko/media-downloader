@@ -23,7 +23,9 @@ function getServiceType(payload: RequestPayload): ServiceType {
 		case RequestType.TWITTER_VERIFY_CREDENTIALS:
 		case RequestType.TWITTER_RATE_LIMIT_STATUS:
 		case RequestType.TWITTER_FOLLOWING_IDS:
-		case RequestType.TWITTER_HOME_TIMELINE: {
+		case RequestType.TWITTER_FOLLOWING_LIST:
+		case RequestType.TWITTER_HOME_TIMELINE:
+		case RequestType.TWITTER_USER_TIMELINE: {
 			return ServiceType.TWITTER;
 		}
 	}
@@ -57,7 +59,9 @@ function getRequestMethod(payload: RequestPayload): RequestMethodType {
 		case RequestType.TWITTER_VERIFY_CREDENTIALS:
 		case RequestType.TWITTER_RATE_LIMIT_STATUS:
 		case RequestType.TWITTER_FOLLOWING_IDS:
-		case RequestType.TWITTER_HOME_TIMELINE: {
+		case RequestType.TWITTER_FOLLOWING_LIST:
+		case RequestType.TWITTER_HOME_TIMELINE:
+		case RequestType.TWITTER_USER_TIMELINE: {
 			return RequestMethodType.GET;
 		}
 	}
@@ -79,6 +83,16 @@ function getURL(payload: RequestPayload): string {
 			const query = qs.stringify(params);
 			return `${API_URL_TWITTER}/friends/ids.json?${query}`;
 		}
+		case RequestType.TWITTER_FOLLOWING_LIST: {
+			const params: any = {
+				'count': 200,
+			};
+			if(payload.params.cursor !== '') {
+				params.cursor = payload.params.cursor;
+			}
+			const query = qs.stringify(params);
+			return `${API_URL_TWITTER}/friends/list.json?${query}`;
+		}
 		case RequestType.TWITTER_HOME_TIMELINE: {
 			const params: any = {
 				'count': '200',
@@ -97,6 +111,29 @@ function getURL(payload: RequestPayload): string {
 			}
 			const query = qs.stringify(params);
 			return `${API_URL_TWITTER}/statuses/home_timeline.json?${query}`;
+		}
+		case RequestType.TWITTER_USER_TIMELINE: {
+			const params: any = {
+				'count': '200',
+				'include_my_retweet': '1',
+				'include_rts': '1',
+				'cards_platform': 'Web-13',
+				'include_entities': '1',
+				'include_user_entities': '1',
+				'include_cards': '1',
+				'send_error_codes': '1',
+				'tweet_mode': 'extended',
+				'include_ext_alt_text': 'true',
+				'include_reply_count': 'true',
+				'user_id': payload.params.user_id,
+			};
+
+			if(payload.params.max_id !== '') {
+				params.max_id = payload.params.max_id;
+			}
+			console.log(params);
+			const query = qs.stringify(params);
+			return `${API_URL_TWITTER}/statuses/user_timeline.json?${query}`;
 		}
 	}
 }
