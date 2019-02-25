@@ -110,6 +110,13 @@ export class Database {
 		}
 	}
 
+	public async getAccounts(): Promise<Array<{
+		id: string;
+		alias: string;
+	}>> {
+		return this.knex(TableName.TWITTER_ACCOUNTS);
+	}
+
 	private async hasTweet(id: string): Promise<boolean> {
 		const rows = await this.knex(TableName.TWITTER_TWEETS).where({
 			'id': id,
