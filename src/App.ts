@@ -25,11 +25,11 @@ export class App {
 			await database.initialize();
 		}
 
-		{
-			Puppeteer.createInstance();
-			const puppeteer = Puppeteer.getInstance();
-			await puppeteer.initialize();
-		}
+		// {
+		// 	Puppeteer.createInstance();
+		// 	const puppeteer = Puppeteer.getInstance();
+		// 	await puppeteer.initialize();
+		// }
 
 		{
 			Twitter.createInstance();
