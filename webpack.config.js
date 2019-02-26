@@ -15,9 +15,9 @@ const __env = require('./env.json');
 module.exports = {
 	'entry': {
 		// 'main': path.resolve(srcPath, 'index.ts'),
-		// 'fetch': path.resolve(srcPath, 'fetch.ts'),
+		'fetch': path.resolve(srcPath, 'fetch.ts'),
 		'user': path.resolve(srcPath, 'user.ts'),
-		// 'download': path.resolve(srcPath, 'download.ts'),
+		'download': path.resolve(srcPath, 'download.ts'),
 	},
 	'output': {
 		'path': distPath,

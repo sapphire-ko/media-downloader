@@ -242,4 +242,8 @@ export class Database {
 			}
 		}
 	}
+
+	public async close() {
+		await this.knex.destroy();
+	}
 }

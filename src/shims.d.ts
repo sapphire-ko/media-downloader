@@ -18,3 +18,5 @@ type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>;
 type AnyObject = {
 	[key: string]: string;
 };
+
+type A = null;

@@ -1,12 +1,14 @@
+import url from 'url';
+
 import puppeteer from 'puppeteer';
 
 import {
 	ServiceType,
 	Configuration,
+	Tweet,
 } from '~/models';
 
 import {
-	mkdir,
 	sleep,
 } from '~/helpers';
 
@@ -151,6 +153,88 @@ export class Puppeteer {
 					'cookie': cookie,
 				};
 			}
+		}
+	}
+
+	private queue: Tweet[][] = [];
+	private shouldProcess = false;
+
+	private async process(page: puppeteer.Page) {
+		do {
+			await sleep(100);
+
+			console.log(`queue=${this.queue.length}`);
+
+			if(this.queue.length === 0) {
+				continue;
+			}
+
+			const tweets = this.queue.shift()!;
+
+			console.log(tweets.length);
+
+			await page.evaluate((_) => {
+				const list = document.querySelector('#open-modal .js-column-scroller');
+				if(list === null) {
+					return;
+				}
+				list.scrollTop = list.scrollHeight;
+			});
+		}
+		while(this.shouldProcess);
+	}
+
+	public async fetchUserTimeline(screenName: string) {
+		if(this.browser === null) {
+			throw new Error('browser is null');
+		}
+
+		try {
+			const page = await this.browser.newPage();
+
+			await page.goto('https://tweetdeck.twitter.com/', {
+				'waitUntil': 'domcontentloaded',
+			});
+
+			this.shouldProcess = true;
+			this.process(page);
+
+			page.on('response', async (response) => {
+				const {
+					pathname,
+				} = url.parse(response.url());
+				if(pathname!.endsWith('statuses/user_timeline.json') !== true) {
+					return;
+				}
+
+				const request = response.request();
+				if(request.method() !== 'GET') {
+					return;
+				}
+
+				const tweets = await response.json();
+				this.queue.push(tweets);
+			});
+
+			const searchSelector = '[data-action="show-search"]';
+			await this.waitElement(page, searchSelector);
+			await page.click(searchSelector);
+
+			const inputSelector = '.search-input.is-focused';
+			await this.waitElement(page, inputSelector);
+			await this.clearInput(page, inputSelector);
+			await page.type(inputSelector, screenName);
+
+			const accountSelector = '.account-summary .username';
+			await this.waitElement(page, accountSelector);
+			await page.click(accountSelector);
+
+			const tweetsSelector = '.js-item-launch[data-type="tweets"]';
+			await this.waitElement(page, tweetsSelector);
+			await page.click(tweetsSelector);
+		}
+		catch(error) {
+			console.log(error);
 		}
 	}
 

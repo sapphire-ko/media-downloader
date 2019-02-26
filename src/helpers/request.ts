@@ -131,7 +131,6 @@ function getURL(payload: RequestPayload): string {
 			if(payload.params.max_id !== '') {
 				params.max_id = payload.params.max_id;
 			}
-			console.log(params);
 			const query = qs.stringify(params);
 			return `${API_URL_TWITTER}/statuses/user_timeline.json?${query}`;
 		}

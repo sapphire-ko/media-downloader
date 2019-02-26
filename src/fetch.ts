@@ -58,12 +58,8 @@ async function fetch(id: string) {
 	try {
 		await sleep(100);
 
-		const status = await sendRequest({
-			'type': RequestType.TWITTER_RATE_LIMIT_STATUS,
-		}) as RateLimitStatus;
-		console.log(status.resources.statuses['/statuses/user_timeline']);
-
 		let maxId = '';
+		let shouldSkip = false;
 
 		do {
 			await sleep(10);
@@ -77,6 +73,12 @@ async function fetch(id: string) {
 			}) as Tweet[];
 
 			console.log(tweets.length);
+			if(tweets.length > 0) {
+				const {
+					user,
+				} = tweets[0];
+				console.log(`${user.id_str} ${user.screen_name}`);
+			}
 
 			for(const tweet of tweets) {
 				await sleep(5);
@@ -93,6 +95,7 @@ async function fetch(id: string) {
 				});
 
 				if(rows.length > 0) {
+					shouldSkip = true;
 					continue;
 				}
 
@@ -147,6 +150,10 @@ async function fetch(id: string) {
 				}
 			}
 
+			if(shouldSkip === true) {
+				console.log('skip');
+			}
+
 			if(tweets.length > 1) {
 				maxId = tweets[tweets.length - 1].id_str;
 			}
@@ -154,7 +161,7 @@ async function fetch(id: string) {
 				break;
 			}
 		}
-		while(true);
+		while(shouldSkip === false);
 	}
 	catch(error) {
 		console.log(error);
@@ -173,11 +180,17 @@ async function fetch(id: string) {
 	Database.createInstance();
 	const database = Database.getInstance();
 
-	const accounts = await database.getAccounts();
+	const status = await sendRequest({
+		'type': RequestType.TWITTER_RATE_LIMIT_STATUS,
+	}) as RateLimitStatus;
+	console.log(status.resources.statuses['/statuses/user_timeline']);
 
+	const accounts = await database.getAccounts();
 	for(const account of accounts) {
 		await sleep(100);
 
 		await fetch(account.id);
 	}
+
+	await database.close();
 })();
