@@ -18,8 +18,6 @@ import {
 	mkdir,
 } from '~/helpers';
 
-import accounts from './accounts';
-
 async function downloadMedia(accountId: string, url_: string) {
 	const dirPath = path.resolve(__path.root, 'download', accountId);
 	await mkdir(dirPath);
@@ -97,6 +95,8 @@ async function download(accountId: string) {
 }
 
 (async () => {
+	await mkdir(path.resolve(__path.root, 'download'));
+
 	Database.createInstance();
 	const database = Database.getInstance();
 	await database.initialize();

@@ -21,6 +21,7 @@ import {
 
 import {
 	sleep,
+	mkdir,
 	sendRequest,
 } from '~/helpers';
 
@@ -171,6 +172,8 @@ async function fetch(id: string) {
 }
 
 (async () => {
+	await mkdir(path.resolve(__path.root, 'fetch'));
+
 	Twitter.createInstance();
 
 	Authentication.createInstance();
