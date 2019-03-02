@@ -25,7 +25,8 @@ function getServiceType(payload: RequestPayload): ServiceType {
 		case RequestType.TWITTER_FOLLOWING_IDS:
 		case RequestType.TWITTER_FOLLOWING_LIST:
 		case RequestType.TWITTER_HOME_TIMELINE:
-		case RequestType.TWITTER_USER_TIMELINE: {
+		case RequestType.TWITTER_USER_TIMELINE:
+		case RequestType.TWITTER_SEARCH_UNIVERSAL: {
 			return ServiceType.TWITTER;
 		}
 	}
@@ -61,7 +62,8 @@ function getRequestMethod(payload: RequestPayload): RequestMethodType {
 		case RequestType.TWITTER_FOLLOWING_IDS:
 		case RequestType.TWITTER_FOLLOWING_LIST:
 		case RequestType.TWITTER_HOME_TIMELINE:
-		case RequestType.TWITTER_USER_TIMELINE: {
+		case RequestType.TWITTER_USER_TIMELINE:
+		case RequestType.TWITTER_SEARCH_UNIVERSAL: {
 			return RequestMethodType.GET;
 		}
 	}
@@ -113,6 +115,11 @@ function getURL(payload: RequestPayload): string {
 			return `${API_URL_TWITTER}/statuses/home_timeline.json?${query}`;
 		}
 		case RequestType.TWITTER_USER_TIMELINE: {
+			const {
+				user_id,
+				max_id,
+			} = payload.params;
+
 			const params: any = {
 				'count': '200',
 				'include_my_retweet': '1',
@@ -125,14 +132,44 @@ function getURL(payload: RequestPayload): string {
 				'tweet_mode': 'extended',
 				'include_ext_alt_text': 'true',
 				'include_reply_count': 'true',
-				'user_id': payload.params.user_id,
+				'user_id': user_id,
 			};
 
-			if(payload.params.max_id !== '') {
-				params.max_id = payload.params.max_id;
+			if(max_id !== '') {
+				params.max_id = max_id;
 			}
 			const query = qs.stringify(params);
 			return `${API_URL_TWITTER}/statuses/user_timeline.json?${query}`;
+		}
+		case RequestType.TWITTER_SEARCH_UNIVERSAL: {
+			const {
+				screen_name,
+				max_id,
+			} = payload.params;
+
+			const params: any = {
+				'count': '200',
+				'modules': 'status',
+				'result_type': 'recent',
+				'pc': 'false',
+				'ui_lang': 'en-US',
+				'cards_platform': 'Web-13',
+				'include_entities': '1',
+				'include_user_entities': '1',
+				'include_cards': '1',
+				'send_error_codes': '1',
+				'tweet_mode': 'extended',
+				'include_ext_alt_text': 'true',
+				'include_reply_count': 'true',
+			};
+
+			params.q = `from:${screen_name}`;
+			if(max_id !== '') {
+				params.q += ` max_id:${max_id}`;
+			}
+
+			const query = qs.stringify(params);
+			return `${API_URL_TWITTER}/search/universal.json?${query}`;
 		}
 	}
 }

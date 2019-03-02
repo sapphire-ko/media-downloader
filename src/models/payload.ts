@@ -36,6 +36,14 @@ interface TwitterUserTimelinePayload {
 	};
 }
 
+interface TwitterSearchUniversalPayload {
+	type: RequestType.TWITTER_SEARCH_UNIVERSAL;
+	params: {
+		screen_name: string;
+		max_id: string;
+	};
+}
+
 export type RequestPayloadTwitter = (
 	| TwitterVerifyCredentialsPayload
 	| TwitterRateLimitStatusPayload
@@ -43,6 +51,7 @@ export type RequestPayloadTwitter = (
 	| TwitterFollowingListPayload
 	| TwitterHomeTimelinePayload
 	| TwitterUserTimelinePayload
+	| TwitterSearchUniversalPayload
 );
 
 export type RequestPayload = (

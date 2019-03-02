@@ -134,5 +134,11 @@ export interface RateLimitStatus {
 			'/friends/vit/list': LimitStatus;
 			'/friends/ids': LimitStatus;
 		};
+		search: {
+			'/search/tweets': LimitStatus;
+			'/search/universal': LimitStatus;
+			'/search/typeahead': LimitStatus;
+			'/search/adaptive': LimitStatus;
+		};
 	};
 }

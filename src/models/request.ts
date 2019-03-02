@@ -5,6 +5,7 @@ export enum RequestType {
 	TWITTER_FOLLOWING_LIST,
 	TWITTER_HOME_TIMELINE,
 	TWITTER_USER_TIMELINE,
+	TWITTER_SEARCH_UNIVERSAL,
 }
 
 export enum RequestMethodType {

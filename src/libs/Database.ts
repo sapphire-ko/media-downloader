@@ -58,6 +58,7 @@ export class Database {
 					}
 					case TableName.TWITTER_TWEETS: {
 						table.string('account_id').notNullable();
+						table.text('data').notNullable();
 						break;
 					}
 					case TableName.TWITTER_MEDIA: {

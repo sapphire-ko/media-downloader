@@ -25,7 +25,17 @@ import {
 	sendRequest,
 } from '~/helpers';
 
-async function fetch(id: string) {
+import accounts from './accounts';
+
+async function fetch(params: {
+	id: string;
+	screen_name: string;
+}) {
+	const {
+		id,
+		screen_name: screenName,
+	} = params;
+
 	const knex = Knex({
 		'client': 'sqlite3',
 		'connection': {
@@ -39,6 +49,7 @@ async function fetch(id: string) {
 		if(exists === false) {
 			await knex.schema.createTable(TableName.TWITTER_TWEETS, (table) => {
 				table.string('id').primary().unique().notNullable();
+				table.text('data').notNullable();
 				table.timestamps(true, true);
 			});
 		}
@@ -60,29 +71,51 @@ async function fetch(id: string) {
 		await sleep(100);
 
 		let maxId = '';
-		let shouldSkip = false;
+		// let shouldSkip = false;
 
 		do {
 			await sleep(10);
 
-			const tweets = await sendRequest({
-				'type': RequestType.TWITTER_USER_TIMELINE,
+			const data = await sendRequest({
+				'type': RequestType.TWITTER_SEARCH_UNIVERSAL,
 				'params': {
-					'user_id': id,
+					'screen_name': screenName,
 					'max_id': maxId,
 				},
-			}) as Tweet[];
+			}) as {
+				modules: Array<{
+					status: {
+						data: Tweet;
+					};
+				}>;
+			};
+
+			const tweets: Tweet[] = [];
+			for(const module of data.modules) {
+				if(module.status === undefined) {
+					continue;
+				}
+				tweets.push(module.status.data);
+			}
 
 			console.log(tweets.length);
-			if(tweets.length > 0) {
-				const {
-					user,
-				} = tweets[0];
-				console.log(`${user.id_str} ${user.screen_name}`);
-			}
 
 			for(const tweet of tweets) {
 				await sleep(5);
+
+				const rows = await knex(TableName.TWITTER_TWEETS).where({
+					'id': tweet.id_str,
+				});
+
+				if(rows.length > 0) {
+					// shouldSkip = true;
+					continue;
+				}
+
+				await knex(TableName.TWITTER_TWEETS).insert({
+					'id': tweet.id_str,
+					'data': JSON.stringify(tweet),
+				});
 
 				if(tweet.retweeted_status !== undefined) {
 					continue;
@@ -90,19 +123,6 @@ async function fetch(id: string) {
 				if(tweet.extended_entities === undefined) {
 					continue;
 				}
-
-				const rows = await knex(TableName.TWITTER_TWEETS).where({
-					'id': tweet.id_str,
-				});
-
-				if(rows.length > 0) {
-					shouldSkip = true;
-					continue;
-				}
-
-				await knex(TableName.TWITTER_TWEETS).insert({
-					'id': tweet.id_str,
-				});
 
 				const {
 					extended_entities: entities,
@@ -144,16 +164,24 @@ async function fetch(id: string) {
 					return medium !== null;
 				});
 
-				if(media.length > 0) {
-					await knex(TableName.TWITTER_MEDIA).insert(media);
+				for(const medium of media) {
+					const rows = await knex(TableName.TWITTER_MEDIA).where({
+						'id': medium!.id,
+					});
+
+					if(rows.length > 0) {
+						continue;
+					}
+
+					await knex(TableName.TWITTER_MEDIA).insert(medium);
 
 					await sleep(10);
 				}
 			}
 
-			if(shouldSkip === true) {
-				console.log('skip');
-			}
+			// if(shouldSkip === true) {
+			// 	console.log('skip');
+			// }
 
 			if(tweets.length > 1) {
 				maxId = tweets[tweets.length - 1].id_str;
@@ -162,7 +190,8 @@ async function fetch(id: string) {
 				break;
 			}
 		}
-		while(shouldSkip === false);
+		// while(shouldSkip === false);
+		while(true);
 	}
 	catch(error) {
 		console.log(error);
@@ -186,13 +215,13 @@ async function fetch(id: string) {
 	const status = await sendRequest({
 		'type': RequestType.TWITTER_RATE_LIMIT_STATUS,
 	}) as RateLimitStatus;
-	console.log(status.resources.statuses['/statuses/user_timeline']);
+	console.log(status.resources.search['/search/universal']);
 
-	const accounts = await database.getAccounts();
+	// const accounts = await database.getAccounts();
 	for(const account of accounts) {
 		await sleep(100);
 
-		await fetch(account.id);
+		await fetch(account);
 	}
 
 	await database.close();
