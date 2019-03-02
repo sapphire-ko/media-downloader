@@ -128,16 +128,16 @@ export class Database {
 
 	private async insertTweet(params: CommandDatabaseInsertTweet['payload']) {
 		const {
-			id,
-			accountId,
+			tweet,
 		} = params;
 
-		const hasTweet = await this.hasTweet(id);
+		const hasTweet = await this.hasTweet(tweet.id_str);
 
 		if(hasTweet === false) {
 			await this.knex(TableName.TWITTER_TWEETS).insert({
-				'id': id,
-				'account_id': accountId,
+				'id': tweet.id_str,
+				'account_id': tweet.user.id_str,
+				'data': JSON.stringify(tweet),
 			});
 		}
 	}

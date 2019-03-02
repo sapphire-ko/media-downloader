@@ -1,3 +1,7 @@
+import {
+	Tweet,
+} from '~/models';
+
 export enum CommandType {
 	TWITTER_RATE_LIMIT_STATUS = 100001,
 	TWITTER_FOLLOWING_IDS,
@@ -39,8 +43,7 @@ export interface CommandDatabaseInsertAccount {
 export interface CommandDatabaseInsertTweet {
 	type: CommandType.DATABASE_INSERT_TWEET;
 	payload: {
-		id: string;
-		accountId: string;
+		tweet: Tweet;
 	};
 }
 

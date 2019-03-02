@@ -109,20 +109,22 @@ export class Twitter {
 					'params': command.payload,
 				}) as Tweet[];
 				for(const tweet of tweets) {
+					if(tweet.retweeted_status !== undefined) {
+						continue;
+					}
+
 					const database = Database.getInstance();
 					database.pushCommand({
 						'type': CommandType.DATABASE_INSERT_TWEET,
 						'payload': {
-							'id': tweet.id_str,
-							'accountId': tweet.user.id_str,
+							'tweet': tweet,
 						},
 					});
-					if(tweet.retweeted_status !== undefined) {
-						continue;
-					}
+
 					if(tweet.extended_entities === undefined) {
 						continue;
 					}
+
 					const {
 						extended_entities: entities,
 					} = tweet;
