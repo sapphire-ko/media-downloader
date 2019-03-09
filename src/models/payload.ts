@@ -10,6 +10,13 @@ interface TwitterRateLimitStatusPayload {
 	type: RequestType.TWITTER_RATE_LIMIT_STATUS;
 }
 
+interface TwitterUserPayload {
+	type: RequestType.TWITTER_USER;
+	params: {
+		user_id: string;
+	};
+}
+
 interface TwitterFollowingIdsPayload {
 	type: RequestType.TWITTER_FOLLOWING_IDS;
 }
@@ -47,6 +54,7 @@ interface TwitterSearchUniversalPayload {
 export type RequestPayloadTwitter = (
 	| TwitterVerifyCredentialsPayload
 	| TwitterRateLimitStatusPayload
+	| TwitterUserPayload
 	| TwitterFollowingIdsPayload
 	| TwitterFollowingListPayload
 	| TwitterHomeTimelinePayload

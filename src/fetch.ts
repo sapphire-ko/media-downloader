@@ -9,13 +9,13 @@ import {
 import {
 	RequestType,
 	RateLimitStatus,
+	AccountTwitter,
 	Tweet,
 	TwitterMediumType,
 } from '~/models';
 
 import {
 	Authentication,
-	Database,
 	Twitter,
 } from '~/libs';
 
@@ -25,17 +25,7 @@ import {
 	sendRequest,
 } from '~/helpers';
 
-import accounts from './accounts';
-
-async function fetch(params: {
-	id: string;
-	screen_name: string;
-}) {
-	const {
-		id,
-		screen_name: screenName,
-	} = params;
-
+async function fetch(id: string) {
 	const knex = Knex({
 		'client': 'sqlite3',
 		'connection': {
@@ -44,6 +34,18 @@ async function fetch(params: {
 		'useNullAsDefault': true,
 	});
 
+	{
+		const exists = await knex.schema.hasTable(TableName.TWITTER_ACCOUNTS);
+		if(exists === false) {
+			await knex.schema.createTable(TableName.TWITTER_ACCOUNTS, (table) => {
+				table.string('id').primary().unique().notNullable();
+				table.string('screen_name').notNullable();
+				table.text('data').notNullable();
+				table.boolean('is_fetched').notNullable();
+				table.timestamps(true, true);
+			});
+		}
+	}
 	{
 		const exists = await knex.schema.hasTable(TableName.TWITTER_TWEETS);
 		if(exists === false) {
@@ -67,14 +69,56 @@ async function fetch(params: {
 		}
 	}
 
+	{
+		const rows = await knex(TableName.TWITTER_ACCOUNTS).limit(1);
+		if(rows.length === 0) {
+			try {
+				const data = await sendRequest({
+					'type': RequestType.TWITTER_USER,
+					'params': {
+						'user_id': id,
+					},
+				}) as AccountTwitter;
+
+				await knex(TableName.TWITTER_ACCOUNTS).insert({
+					'id': id,
+					'screen_name': data.screen_name,
+					'data': JSON.stringify(data),
+					'is_fetched': false,
+				});
+			}
+			catch(error) {
+				console.log(error);
+				await knex.destroy();
+				return;
+			}
+		}
+	}
+
+	const rows = await knex(TableName.TWITTER_ACCOUNTS).limit(1);
+	const {
+		screen_name: screenName,
+		is_fetched,
+	} = rows[0];
+
+	const isFetched = is_fetched === 1;
+	// const isFetched = 0 !== 0;
+
 	try {
 		await sleep(100);
 
 		let maxId = '';
-		// let shouldSkip = false;
+		let shouldSkip = false;
+
+		if(isFetched === false) {
+			const rows = await knex(TableName.TWITTER_TWEETS).select('id').orderByRaw('length(id)').limit(1);
+			if(rows.length > 0) {
+				maxId = rows[0].id;
+			}
+		}
 
 		do {
-			await sleep(10);
+			await sleep(100);
 
 			const data = await sendRequest({
 				'type': RequestType.TWITTER_SEARCH_UNIVERSAL,
@@ -108,14 +152,17 @@ async function fetch(params: {
 				});
 
 				if(rows.length > 0) {
-					// shouldSkip = true;
-					continue;
+					if(isFetched === true) {
+						shouldSkip = true;
+						continue;
+					}
 				}
-
-				await knex(TableName.TWITTER_TWEETS).insert({
-					'id': tweet.id_str,
-					'data': JSON.stringify(tweet),
-				});
+				else {
+					await knex(TableName.TWITTER_TWEETS).insert({
+						'id': tweet.id_str,
+						'data': JSON.stringify(tweet),
+					});
+				}
 
 				if(tweet.retweeted_status !== undefined) {
 					continue;
@@ -179,19 +226,21 @@ async function fetch(params: {
 				}
 			}
 
-			// if(shouldSkip === true) {
-			// 	console.log('skip');
-			// }
-
 			if(tweets.length > 1) {
 				maxId = tweets[tweets.length - 1].id_str;
 			}
 			else {
+				if(isFetched === false) {
+					await knex(TableName.TWITTER_ACCOUNTS).where({
+						'id': id,
+					}).update({
+						'is_fetched': true,
+					});
+				}
 				break;
 			}
 		}
-		// while(shouldSkip === false);
-		while(true);
+		while(shouldSkip === false);
 	}
 	catch(error) {
 		console.log(error);
@@ -209,20 +258,20 @@ async function fetch(params: {
 	const auth = Authentication.getInstance();
 	await auth.initialize();
 
-	Database.createInstance();
-	const database = Database.getInstance();
-
 	const status = await sendRequest({
 		'type': RequestType.TWITTER_RATE_LIMIT_STATUS,
 	}) as RateLimitStatus;
 	console.log(status.resources.search['/search/universal']);
 
-	// const accounts = await database.getAccounts();
-	for(const account of accounts) {
+	const data = await sendRequest({
+		'type': RequestType.TWITTER_FOLLOWING_IDS,
+	}) as {
+		ids: string[];
+	};
+
+	for(const id of data.ids) {
 		await sleep(100);
 
-		await fetch(account);
+		await fetch(id);
 	}
-
-	await database.close();
 })();

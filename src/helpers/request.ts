@@ -22,6 +22,7 @@ function getServiceType(payload: RequestPayload): ServiceType {
 	switch(payload.type) {
 		case RequestType.TWITTER_VERIFY_CREDENTIALS:
 		case RequestType.TWITTER_RATE_LIMIT_STATUS:
+		case RequestType.TWITTER_USER:
 		case RequestType.TWITTER_FOLLOWING_IDS:
 		case RequestType.TWITTER_FOLLOWING_LIST:
 		case RequestType.TWITTER_HOME_TIMELINE:
@@ -59,6 +60,7 @@ function getRequestMethod(payload: RequestPayload): RequestMethodType {
 	switch(payload.type) {
 		case RequestType.TWITTER_VERIFY_CREDENTIALS:
 		case RequestType.TWITTER_RATE_LIMIT_STATUS:
+		case RequestType.TWITTER_USER:
 		case RequestType.TWITTER_FOLLOWING_IDS:
 		case RequestType.TWITTER_FOLLOWING_LIST:
 		case RequestType.TWITTER_HOME_TIMELINE:
@@ -76,6 +78,13 @@ function getURL(payload: RequestPayload): string {
 		}
 		case RequestType.TWITTER_RATE_LIMIT_STATUS: {
 			return `${API_URL_TWITTER}/application/rate_limit_status.json`;
+		}
+		case RequestType.TWITTER_USER: {
+			const params = {
+				'user_id': payload.params.user_id,
+			};
+			const query = qs.stringify(params);
+			return `${API_URL_TWITTER}/users/show.json?${query}`;
 		}
 		case RequestType.TWITTER_FOLLOWING_IDS: {
 			const params: any = {

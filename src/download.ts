@@ -95,24 +95,26 @@ async function download(accountId: string) {
 }
 
 (async () => {
-	await mkdir(path.resolve(__path.root, 'download'));
-
-	Database.createInstance();
-	const database = Database.getInstance();
-	await database.initialize();
-
-	const accounts = await database.getAccounts();
-
 	try {
-		for(const account of accounts) {
+		const databasePath = path.resolve(__path.root, 'fetch');
+		const downloadPath = path.resolve(__path.root, 'download');
+		await mkdir(downloadPath);
+
+		const files = await fs.promises.readdir(databasePath);
+		console.log(files);
+
+		for(const file of files) {
+			if(file.endsWith('.sqlite') === false) {
+				continue;
+			}
+
 			await sleep(10);
 
-			await download(account.id);
+			const id = file.split('.').shift()!;
+			await download(id);
 		}
 	}
 	catch(error) {
 		console.log(error);
 	}
-
-	await database.close();
 })();
