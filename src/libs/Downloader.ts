@@ -1,6 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import url from 'url';
+import assert from 'assert';
 
 import request from 'request';
 
@@ -32,25 +33,6 @@ export class Downloader {
 		return this.instance;
 	}
 
-	private async checkFile(accountId: string, name: string): Promise<boolean> {
-		const targetPath = path.join(__path.data, accountId, name);
-
-		try {
-			await fs.promises.lstat(targetPath);
-			return true;
-		}
-		catch(error) {
-			switch(error.code) {
-				case 'ENOENT': {
-					return false;
-				}
-				default: {
-					throw error;
-				}
-			}
-		}
-	}
-
 	private async download(accountId: string, url_: string) {
 		await mkdir(`${__path.data}/${accountId}`);
 
@@ -62,13 +44,19 @@ export class Downloader {
 
 		const filePath = path.resolve(__path.data, accountId, name);
 
-		const exists = await this.checkFile(accountId, name);
-		if(exists === false) {
-			return new Promise((resolve, reject) => {
-				const stream = fs.createWriteStream(filePath);
-				request(url_).on('error', reject).on('close', resolve).pipe(stream);
-			});
-		}
+		const size = await new Promise<number>((resolve, reject) => {
+			let size = 0;
+			const stream = fs.createWriteStream(filePath);
+			request(url_).on('response', (response) => {
+				size = parseInt(response.headers['content-length']!, 10);
+			}).on('close', () => {
+				resolve(size);
+			}).on('error', reject).pipe(stream);
+		});
+
+		const stats = await fs.promises.lstat(filePath);
+
+		assert(stats.size === size, 'file did not downloaded properly');
 	}
 
 	public async downloadMedia() {

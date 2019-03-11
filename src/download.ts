@@ -1,6 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import url from 'url';
+import assert from 'assert';
 
 import request from 'request';
 import Knex from 'knex';
@@ -8,10 +9,6 @@ import Knex from 'knex';
 import {
 	TableName,
 } from '~/constants';
-
-import {
-	Database,
-} from '~/libs';
 
 import {
 	sleep,
@@ -30,10 +27,18 @@ async function downloadMedia(accountId: string, url_: string) {
 
 	const filePath = path.resolve(dirPath, name);
 
-	return new Promise((resolve, reject) => {
+	const size = await new Promise<number>((resolve, reject) => {
 		const stream = fs.createWriteStream(filePath);
-		request(url_).on('error', reject).on('close', resolve).pipe(stream);
+		let size = 0;
+		request(url_).on('response', (response) => {
+			size = parseInt(response.headers['content-length']!, 10);
+		}).on('error', reject).on('close', () => {
+			resolve(size);
+		}).pipe(stream);
 	});
+
+	const stats = await fs.promises.lstat(filePath);
+	assert(stats.size === size, 'file did not downloaded properly');
 }
 
 async function download(accountId: string) {
@@ -101,7 +106,6 @@ async function download(accountId: string) {
 		await mkdir(downloadPath);
 
 		const files = await fs.promises.readdir(databasePath);
-		console.log(files);
 
 		for(const file of files) {
 			if(file.endsWith('.sqlite') === false) {
