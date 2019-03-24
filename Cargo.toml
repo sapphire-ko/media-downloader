@@ -5,3 +5,4 @@ authors = ["sapphire <info@sapphire.sh>"]
 edition = "2018"
 
 [dependencies]
+rusqlite = "0.17.0"

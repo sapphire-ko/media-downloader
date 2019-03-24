@@ -47,7 +47,7 @@ async function download(accountId: string) {
 	const knex = Knex({
 		'client': 'sqlite3',
 		'connection': {
-			'filename': path.resolve(__path.root, 'fetch', `${accountId}.sqlite`),
+			'filename': path.resolve(__path.data, `${accountId}.sqlite`),
 		},
 		'useNullAsDefault': true,
 	});
