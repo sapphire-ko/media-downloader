@@ -101,11 +101,10 @@ async function download(accountId: string) {
 
 (async () => {
 	try {
-		const databasePath = path.resolve(__path.root, 'fetch');
 		const downloadPath = path.resolve(__path.root, 'download');
 		await mkdir(downloadPath);
 
-		const files = await fs.promises.readdir(databasePath);
+		const files = await fs.promises.readdir(__path.data);
 
 		for(const file of files) {
 			if(file.endsWith('.sqlite') === false) {
