@@ -269,9 +269,20 @@ async function fetch(id: string) {
 		ids: string[];
 	};
 
-	for(const id of data.ids) {
-		await sleep(100);
+	const promises = Array.from(Array(5)).map(async () => {
+		do {
+			const id = data.ids.shift();
 
-		await fetch(id);
-	}
+			if(typeof id !== 'string') {
+				return;
+			}
+
+			await sleep(100);
+
+			await fetch(id);
+		}
+		while(data.ids.length > 0);
+	});
+
+	await Promise.all(promises);
 })();

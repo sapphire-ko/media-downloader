@@ -104,18 +104,27 @@ async function download(accountId: string) {
 		const downloadPath = path.resolve(__path.root, 'download');
 		await mkdir(downloadPath);
 
-		const files = await fs.promises.readdir(__path.data);
+		const files = (await fs.promises.readdir(__path.data)).filter((e) => {
+			return e.endsWith('.sqlite');
+		}).filter((e) => {
+			return e !== 'media_downloader.sqlite';
+		});
 
-		for(const file of files) {
-			if(file.endsWith('.sqlite') === false) {
-				continue;
+		const promises = Array.from(Array(5)).map(async () => {
+			do {
+				const file = files.shift();
+
+				if(typeof file !== 'string') {
+					return;
+				}
+
+				await sleep(10);
+
+				const id = file.split('.').shift()!;
+				await download(id);
 			}
-
-			await sleep(10);
-
-			const id = file.split('.').shift()!;
-			await download(id);
-		}
+			while(files.length > 0);
+		});
 	}
 	catch(error) {
 		console.log(error);
