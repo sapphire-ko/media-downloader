@@ -250,39 +250,49 @@ async function fetch(id: string) {
 }
 
 (async () => {
-	await mkdir(path.resolve(__path.root, 'fetch'));
+	try {
+		await mkdir(path.resolve(__path.root, 'fetch'));
 
-	Twitter.createInstance();
+		Twitter.createInstance();
 
-	Authentication.createInstance();
-	const auth = Authentication.getInstance();
-	await auth.initialize();
+		Authentication.createInstance();
+		const auth = Authentication.getInstance();
+		await auth.initialize();
 
-	const status = await sendRequest({
-		'type': RequestType.TWITTER_RATE_LIMIT_STATUS,
-	}) as RateLimitStatus;
-	console.log(status.resources.search['/search/universal']);
+		const status = await sendRequest({
+			'type': RequestType.TWITTER_RATE_LIMIT_STATUS,
+		}) as RateLimitStatus;
+		console.log(status.resources.search['/search/universal']);
 
-	const data = await sendRequest({
-		'type': RequestType.TWITTER_FOLLOWING_IDS,
-	}) as {
-		ids: string[];
-	};
+		const data = await sendRequest({
+			'type': RequestType.TWITTER_FOLLOWING_IDS,
+		}) as {
+			ids: string[];
+		};
 
-	const promises = Array.from(Array(5)).map(async () => {
-		do {
-			const id = data.ids.shift();
+		let count = 0;
+		const promises = Array.from(Array(5)).map(async () => {
+			do {
+				const id = data.ids.shift();
 
-			if(typeof id !== 'string') {
-				return;
+				if(typeof id !== 'string') {
+					return;
+				}
+
+				await sleep(100);
+
+				await fetch(id);
 			}
+			while(data.ids.length > 0);
 
-			await sleep(100);
+			++count;
+		});
 
-			await fetch(id);
-		}
-		while(data.ids.length > 0);
-	});
+		await Promise.all(promises);
 
-	await Promise.all(promises);
+		console.log(`count: ${count} / ${data.ids.length}`);
+	}
+	catch(error) {
+		console.log(error);
+	}
 })();

@@ -15,8 +15,8 @@ import {
 	mkdir,
 } from '~/helpers';
 
-async function downloadMedia(accountId: string, url_: string) {
-	const dirPath = path.resolve(__path.root, 'download', accountId);
+async function downloadMedia(downloadPath: string, accountId: string, url_: string) {
+	const dirPath = path.resolve(downloadPath, accountId);
 	await mkdir(dirPath);
 
 	let name = url.parse(url_).pathname!;
@@ -41,9 +41,7 @@ async function downloadMedia(accountId: string, url_: string) {
 	assert(stats.size === size, 'file did not downloaded properly');
 }
 
-async function download(accountId: string) {
-	console.log(accountId);
-
+async function download(pathName: string, accountId: string) {
 	const knex = Knex({
 		'client': 'sqlite3',
 		'connection': {
@@ -62,7 +60,9 @@ async function download(accountId: string) {
 		retry_count: number;
 	}>;
 
-	console.log(rows.length);
+	if(rows.length > 0) {
+		console.log(`${rows.length} ${accountId}`);
+	}
 
 	for(const row of rows) {
 		if(row.downloaded === true) {
@@ -75,7 +75,7 @@ async function download(accountId: string) {
 		await sleep(10);
 
 		try {
-			await downloadMedia(accountId, row.url);
+			await downloadMedia(pathName, accountId, row.url);
 
 			await sleep(10);
 
@@ -104,12 +104,17 @@ async function download(accountId: string) {
 		const downloadPath = path.resolve(__path.root, 'download');
 		await mkdir(downloadPath);
 
+		const aPath = path.resolve(downloadPath, `${Date.now()}`);
+
+		await mkdir(aPath);
+
 		const files = (await fs.promises.readdir(__path.data)).filter((e) => {
 			return e.endsWith('.sqlite');
 		}).filter((e) => {
 			return e !== 'media_downloader.sqlite';
 		});
 
+		let count = 0;
 		const promises = Array.from(Array(5)).map(async () => {
 			do {
 				const file = files.shift();
@@ -121,10 +126,16 @@ async function download(accountId: string) {
 				await sleep(10);
 
 				const id = file.split('.').shift()!;
-				await download(id);
+				await download(aPath, id);
+
+				++count;
 			}
 			while(files.length > 0);
 		});
+
+		await Promise.all(promises);
+
+		console.log(`count: ${count} / ${files.length}`);
 	}
 	catch(error) {
 		console.log(error);
