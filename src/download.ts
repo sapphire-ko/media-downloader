@@ -20,7 +20,7 @@ async function downloadMedia(downloadPath: string, accountId: string, url_: stri
 	await mkdir(dirPath);
 
 	let name = url.parse(url_).pathname!;
-	if(name.endsWith(':orig') === true) {
+	if (name.endsWith(':orig') === true) {
 		name = name.substr(0, name.length - 5);
 	}
 	name = name.split('/').pop()!;
@@ -60,15 +60,15 @@ async function download(pathName: string, accountId: string) {
 		retry_count: number;
 	}>;
 
-	if(rows.length > 0) {
+	if (rows.length > 0) {
 		console.log(`${rows.length} ${accountId}`);
 	}
 
-	for(const row of rows) {
-		if(row.downloaded === true) {
+	for (const row of rows) {
+		if (row.downloaded === true) {
 			continue;
 		}
-		if(row.retry_count > 10) {
+		if (row.retry_count > 10) {
 			continue;
 		}
 
@@ -85,7 +85,7 @@ async function download(pathName: string, accountId: string) {
 				'downloaded': true,
 			});
 		}
-		catch(error) {
+		catch (error) {
 			await sleep(10);
 
 			await knex(TableName.TWITTER_MEDIA).where({
@@ -111,7 +111,15 @@ async function download(pathName: string, accountId: string) {
 		const files = (await fs.promises.readdir(__path.data)).filter((e) => {
 			return e.endsWith('.sqlite');
 		}).filter((e) => {
-			return e !== 'media_downloader.sqlite';
+			switch (e) {
+				case 'media_downloader.sqlite':
+				case 'ids.sqlite': {
+					return false;
+				}
+				default: {
+					return true;
+				}
+			}
 		});
 
 		let count = 0;
@@ -119,7 +127,7 @@ async function download(pathName: string, accountId: string) {
 			do {
 				const file = files.shift();
 
-				if(typeof file !== 'string') {
+				if (typeof file !== 'string') {
 					return;
 				}
 
@@ -130,14 +138,14 @@ async function download(pathName: string, accountId: string) {
 
 				++count;
 			}
-			while(files.length > 0);
+			while (files.length > 0);
 		});
 
 		await Promise.all(promises);
 
 		console.log(`count: ${count} / ${files.length}`);
 	}
-	catch(error) {
-		console.log(error);
+	catch (error) {
+		console.trace(error);
 	}
 })();
