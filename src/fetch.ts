@@ -270,6 +270,30 @@ async function fetch(id: string) {
 			ids: string[];
 		};
 
+		{
+			const knex = Knex({
+				'client': 'sqlite3',
+				'connection': {
+					'filename': path.resolve(__path.data, `ids.sqlite`),
+				},
+				'useNullAsDefault': true,
+			});
+
+			const exists = await knex.schema.hasTable(TableName.TWITTER_IDS);
+			if(exists === false) {
+				await knex.schema.createTable(TableName.TWITTER_IDS, (table) => {
+					table.text('ids').notNullable();
+					table.timestamps(true, true);
+				});
+			}
+
+			await knex(TableName.TWITTER_IDS).insert({
+				'ids': data.ids.join(' '),
+			});
+
+			await knex.destroy();
+		}
+
 		let count = 0;
 		const promises = Array.from(Array(5)).map(async () => {
 			do {
