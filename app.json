@@ -1,0 +1,4 @@
+{
+  "name": "media-downloader",
+  "script": "./dist/main.js"
+}
