@@ -9,7 +9,10 @@
     "build:prod": "cross-env NODE_ENV=production npm run _build",
     "build": "npm run build:dev",
     "start": "pm2 start ./app.json",
-    "stop": "pm2 stop ./app.json"
+    "stop": "pm2 stop ./app.json",
+    "fetch": "node ./dist/fetch.js",
+    "download": "node ./dist/download.js",
+    "backup": "npm run fetch && npm run download"
   },
   "repository": {
     "type": "git",
