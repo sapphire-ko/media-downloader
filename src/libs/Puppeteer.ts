@@ -81,8 +81,11 @@ export class Puppeteer {
 					password,
 				} = __account.twitter;
 
-				await this.waitElement(page, '.js-username-field');
-				await this.waitElement(page, '.js-password-field');
+				const usernameSelector = 'input[name="session[username_or_email]"]';
+				const passwordSelector = 'input[name="session[password]"]';
+
+				await this.waitElement(page, usernameSelector);
+				await this.waitElement(page, passwordSelector);
 
 				{
 					let shouldWait = true;
@@ -90,17 +93,17 @@ export class Puppeteer {
 					do {
 						await sleep(500);
 
-						await this.clearInput(page, '.js-username-field');
-						await page.type('.js-username-field', username);
+						await this.clearInput(page, usernameSelector);
+						await page.type(usernameSelector, username);
 
 						await sleep(500);
 
-						await this.clearInput(page, '.js-password-field');
-						await page.type('.js-password-field', password);
+						await this.clearInput(page, passwordSelector);
+						await page.type(passwordSelector, password);
 
 						const values = await page.evaluate(() => {
-							const usernameField = document.querySelector('.js-username-field') as HTMLInputElement;
-							const passwordField = document.querySelector('.js-password-field') as HTMLInputElement;
+							const usernameField = document.querySelector('input[name="session[username_or_email]"]') as HTMLInputElement;
+							const passwordField = document.querySelector('input[name="session[password]"]') as HTMLInputElement;
 
 							if(usernameField === null || passwordField === null) {
 								return null;
