@@ -1,7 +1,4 @@
-import url from 'url';
-
 import knex from 'knex';
-import qs from 'qs';
 
 import {
 	TableName,
@@ -48,7 +45,7 @@ export class Database {
 	private async createTable<T extends TableName>(tableName: T) {
 		const exists = await this.knex.schema.hasTable(tableName);
 		if(exists === false) {
-			await this.knex.schema.createTable(tableName, (table) => {
+			await this.knex.schema.createTable(tableName, table => {
 				table.string('id').unique();
 
 				switch(tableName) {

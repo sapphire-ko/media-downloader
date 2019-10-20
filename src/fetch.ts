@@ -36,8 +36,8 @@ async function fetch(id: string) {
 
 	{
 		const exists = await knex.schema.hasTable(TableName.TWITTER_ACCOUNTS);
-		if(exists === false) {
-			await knex.schema.createTable(TableName.TWITTER_ACCOUNTS, (table) => {
+		if (exists === false) {
+			await knex.schema.createTable(TableName.TWITTER_ACCOUNTS, table => {
 				table.string('id').primary().unique().notNullable();
 				table.string('screen_name').notNullable();
 				table.text('data').notNullable();
@@ -48,8 +48,8 @@ async function fetch(id: string) {
 	}
 	{
 		const exists = await knex.schema.hasTable(TableName.TWITTER_TWEETS);
-		if(exists === false) {
-			await knex.schema.createTable(TableName.TWITTER_TWEETS, (table) => {
+		if (exists === false) {
+			await knex.schema.createTable(TableName.TWITTER_TWEETS, table => {
 				table.string('id').primary().unique().notNullable();
 				table.text('data').notNullable();
 				table.timestamps(true, true);
@@ -58,8 +58,8 @@ async function fetch(id: string) {
 	}
 	{
 		const exists = await knex.schema.hasTable(TableName.TWITTER_MEDIA);
-		if(exists === false) {
-			await knex.schema.createTable(TableName.TWITTER_MEDIA, (table) => {
+		if (exists === false) {
+			await knex.schema.createTable(TableName.TWITTER_MEDIA, table => {
 				table.string('id').primary().unique().notNullable();
 				table.string('tweet_id').notNullable();
 				table.string('url').notNullable();
@@ -71,7 +71,7 @@ async function fetch(id: string) {
 
 	{
 		const rows = await knex(TableName.TWITTER_ACCOUNTS).limit(1);
-		if(rows.length === 0) {
+		if (rows.length === 0) {
 			try {
 				const data = await sendRequest({
 					'type': RequestType.TWITTER_USER,
@@ -87,7 +87,7 @@ async function fetch(id: string) {
 					'is_fetched': false,
 				});
 			}
-			catch(error) {
+			catch (error) {
 				console.log(error);
 				await knex.destroy();
 				return;
@@ -110,9 +110,9 @@ async function fetch(id: string) {
 		let maxId = '';
 		let shouldSkip = false;
 
-		if(isFetched === false) {
+		if (isFetched === false) {
 			const rows = await knex(TableName.TWITTER_TWEETS).select('id').orderByRaw('length(id)').limit(1);
-			if(rows.length > 0) {
+			if (rows.length > 0) {
 				maxId = rows[0].id;
 			}
 		}
@@ -135,8 +135,8 @@ async function fetch(id: string) {
 			};
 
 			const tweets: Tweet[] = [];
-			for(const module of data.modules) {
-				if(module.status === undefined) {
+			for (const module of data.modules) {
+				if (module.status === undefined) {
 					continue;
 				}
 				tweets.push(module.status.data);
@@ -144,15 +144,15 @@ async function fetch(id: string) {
 
 			console.log(tweets.length);
 
-			for(const tweet of tweets) {
+			for (const tweet of tweets) {
 				await sleep(5);
 
 				const rows = await knex(TableName.TWITTER_TWEETS).where({
 					'id': tweet.id_str,
 				});
 
-				if(rows.length > 0) {
-					if(isFetched === true) {
+				if (rows.length > 0) {
+					if (isFetched === true) {
 						shouldSkip = true;
 						continue;
 					}
@@ -164,10 +164,10 @@ async function fetch(id: string) {
 					});
 				}
 
-				if(tweet.retweeted_status !== undefined) {
+				if (tweet.retweeted_status !== undefined) {
 					continue;
 				}
-				if(tweet.extended_entities === undefined) {
+				if (tweet.extended_entities === undefined) {
 					continue;
 				}
 
@@ -175,11 +175,11 @@ async function fetch(id: string) {
 					extended_entities: entities,
 				} = tweet;
 
-				const media = entities.media.map((medium) => {
+				const media = entities.media.map(medium => {
 					let id: string | null = null;
 					let url: string | null = null;
 
-					switch(medium.type) {
+					switch (medium.type) {
 						case TwitterMediumType.PHOTO: {
 							id = medium.id_str;
 							url = `${medium.media_url_https}:orig`;
@@ -187,7 +187,7 @@ async function fetch(id: string) {
 						}
 						case TwitterMediumType.VIDEO: {
 							id = medium.id_str;
-							url = medium.video_info.variants.filter((e) => {
+							url = medium.video_info.variants.filter(e => {
 								return e.content_type.startsWith('video');
 							}).sort((a, b) => {
 								return a.bitrate - b.bitrate;
@@ -196,7 +196,7 @@ async function fetch(id: string) {
 						}
 					}
 
-					if(id === null || url === null) {
+					if (id === null || url === null) {
 						return null;
 					}
 
@@ -207,16 +207,14 @@ async function fetch(id: string) {
 						'downloaded': false,
 						'retry_count': 0,
 					};
-				}).filter((medium) => {
-					return medium !== null;
-				});
+				}).filter(x =>  x !== null);
 
-				for(const medium of media) {
+				for (const medium of media) {
 					const rows = await knex(TableName.TWITTER_MEDIA).where({
 						'id': medium!.id,
 					});
 
-					if(rows.length > 0) {
+					if (rows.length > 0) {
 						continue;
 					}
 
@@ -226,11 +224,11 @@ async function fetch(id: string) {
 				}
 			}
 
-			if(tweets.length > 1) {
+			if (tweets.length > 1) {
 				maxId = tweets[tweets.length - 1].id_str;
 			}
 			else {
-				if(isFetched === false) {
+				if (isFetched === false) {
 					await knex(TableName.TWITTER_ACCOUNTS).where({
 						'id': id,
 					}).update({
@@ -240,9 +238,9 @@ async function fetch(id: string) {
 				break;
 			}
 		}
-		while(shouldSkip === false);
+		while (shouldSkip === false);
 	}
-	catch(error) {
+	catch (error) {
 		console.log(error);
 	}
 
@@ -280,8 +278,8 @@ async function fetch(id: string) {
 			});
 
 			const exists = await knex.schema.hasTable(TableName.TWITTER_IDS);
-			if(exists === false) {
-				await knex.schema.createTable(TableName.TWITTER_IDS, (table) => {
+			if (exists === false) {
+				await knex.schema.createTable(TableName.TWITTER_IDS, table => {
 					table.text('ids').notNullable();
 					table.timestamps(true, true);
 				});
@@ -299,7 +297,7 @@ async function fetch(id: string) {
 			do {
 				const id = data.ids.shift();
 
-				if(typeof id !== 'string') {
+				if (typeof id !== 'string') {
 					return;
 				}
 
@@ -307,7 +305,7 @@ async function fetch(id: string) {
 
 				await fetch(id);
 			}
-			while(data.ids.length > 0);
+			while (data.ids.length > 0);
 
 			++count;
 		});
@@ -316,7 +314,7 @@ async function fetch(id: string) {
 
 		console.log(`count: ${count} / ${data.ids.length}`);
 	}
-	catch(error) {
+	catch (error) {
 		console.log(error);
 	}
 })();

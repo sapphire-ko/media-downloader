@@ -14,6 +14,10 @@ import {
 	sleep,
 } from '~/helpers';
 
+function parseURL(value: string) {
+	return url.parse(value);
+}
+
 export class Downloader {
 	private static instance: Downloader | null = null;
 
@@ -33,10 +37,10 @@ export class Downloader {
 		return this.instance;
 	}
 
-	private async download(accountId: string, url_: string) {
+	private async download(accountId: string, url: string) {
 		await mkdir(`${__path.data}/${accountId}`);
 
-		let name = url.parse(url_).pathname!;
+		let name = parseURL(url).pathname!;
 		if(name.endsWith(':orig') === true) {
 			name = name.substr(0, name.length - 5);
 		}
@@ -47,7 +51,7 @@ export class Downloader {
 		const size = await new Promise<number>((resolve, reject) => {
 			let size = 0;
 			const stream = fs.createWriteStream(filePath);
-			request(url_).on('response', (response) => {
+			request(url).on('response', response => {
 				size = parseInt(response.headers['content-length']!, 10);
 			}).on('close', () => {
 				resolve(size);

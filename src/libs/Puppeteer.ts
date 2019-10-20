@@ -138,9 +138,9 @@ export class Puppeteer {
 				}) as string;
 
 				const cookies = await page.cookies();
-				const cookie = cookies.filter((cookie) => {
+				const cookie = cookies.filter(cookie => {
 					return cookie.domain === '.twitter.com';
-				}).map((cookie) => {
+				}).map(cookie => {
 					return `${cookie.name}=${cookie.value}`;
 				}).join('; ');
 
@@ -150,7 +150,7 @@ export class Puppeteer {
 					'type': ServiceType.TWITTER,
 					'userAgent': userAgent,
 					'bearerToken': bearerToken,
-					'csrfToken': cookies.find((cookie) => {
+					'csrfToken': cookies.find(cookie => {
 						return cookie.name === 'ct0';
 					})!.value,
 					'cookie': cookie,
@@ -176,7 +176,7 @@ export class Puppeteer {
 
 			console.log(tweets.length);
 
-			await page.evaluate((_) => {
+			await page.evaluate(_ => {
 				const list = document.querySelector('#open-modal .js-column-scroller');
 				if(list === null) {
 					return;
@@ -202,7 +202,7 @@ export class Puppeteer {
 			this.shouldProcess = true;
 			this.process(page);
 
-			page.on('response', async (response) => {
+			page.on('response', async response => {
 				const {
 					pathname,
 				} = url.parse(response.url());

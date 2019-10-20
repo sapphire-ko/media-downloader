@@ -15,11 +15,15 @@ import {
 	mkdir,
 } from '~/helpers';
 
-async function downloadMedia(downloadPath: string, accountId: string, url_: string) {
+function parseURL(value: string) {
+	return url.parse(value);
+}
+
+async function downloadMedia(downloadPath: string, accountId: string, url: string) {
 	const dirPath = path.resolve(downloadPath, accountId);
 	await mkdir(dirPath);
 
-	let name = url.parse(url_).pathname!;
+	let name = parseURL(url).pathname!;
 	if (name.endsWith(':orig') === true) {
 		name = name.substr(0, name.length - 5);
 	}
@@ -30,7 +34,7 @@ async function downloadMedia(downloadPath: string, accountId: string, url_: stri
 	const size = await new Promise<number>((resolve, reject) => {
 		const stream = fs.createWriteStream(filePath);
 		let size = 0;
-		request(url_).on('response', (response) => {
+		request(url).on('response', response => {
 			size = parseInt(response.headers['content-length']!, 10);
 		}).on('error', reject).on('close', () => {
 			resolve(size);
@@ -108,9 +112,7 @@ async function download(pathName: string, accountId: string) {
 
 		await mkdir(aPath);
 
-		const files = (await fs.promises.readdir(__path.data)).filter((e) => {
-			return e.endsWith('.sqlite');
-		}).filter((e) => {
+		const files = (await fs.promises.readdir(__path.data)).filter(e => e.endsWith('.sqlite')).filter(e => {
 			switch (e) {
 				case 'media_downloader.sqlite':
 				case 'ids.sqlite': {

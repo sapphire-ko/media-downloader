@@ -141,7 +141,7 @@ export class Twitter {
 							}
 							case TwitterMediumType.VIDEO: {
 								id = medium.id_str;
-								url = medium.video_info.variants.filter((e) => {
+								url = medium.video_info.variants.filter(e => {
 									return e.content_type.startsWith('video');
 								}).sort((a, b) => {
 									return a.bitrate - b.bitrate;
