@@ -207,7 +207,7 @@ async function fetch(id: string) {
 						'downloaded': false,
 						'retry_count': 0,
 					};
-				}).filter(x =>  x !== null);
+				}).filter(x => x !== null);
 
 				for (const medium of media) {
 					const rows = await knex(TableName.TWITTER_MEDIA).where({
@@ -249,8 +249,6 @@ async function fetch(id: string) {
 
 (async () => {
 	try {
-		await mkdir(path.resolve(__path.root, 'fetch'));
-
 		Twitter.createInstance();
 
 		Authentication.createInstance();
@@ -260,13 +258,41 @@ async function fetch(id: string) {
 		const status = await sendRequest({
 			'type': RequestType.TWITTER_RATE_LIMIT_STATUS,
 		}) as RateLimitStatus;
+		console.log(status.resources.friends['/friends/list']);
 		console.log(status.resources.search['/search/universal']);
 
-		const data = await sendRequest({
-			'type': RequestType.TWITTER_FOLLOWING_IDS,
-		}) as {
-			ids: string[];
-		};
+		let users: AccountTwitter[] = [];
+		let cursor = '';
+		do {
+			const data: {
+				users: AccountTwitter[];
+				next_cursor_str: string;
+				previous_cursor_str: string;
+			} = await sendRequest({
+				type: RequestType.TWITTER_FOLLOWING_LIST,
+				params: {
+					cursor,
+					skip_status: true,
+					include_user_entities: false,
+				},
+			});
+			users = users.concat(data.users);
+			cursor = data.next_cursor_str;
+			await sleep(100);
+			console.log('user count', users.length);
+		}
+		while (cursor !== '0');
+
+		// const ids: string[] = [];
+		// let skip = true;
+		// for (const user of users) {
+		// 	if (user.screen_name === 'ricounco') {
+		// 		skip = false;
+		// 	}
+		// 	if (skip) { continue; }
+		// 	ids.push(user.id_str);
+		// }
+		const ids = users.map(x => x.id_str);
 
 		{
 			const knex = Knex({
@@ -286,7 +312,7 @@ async function fetch(id: string) {
 			}
 
 			await knex(TableName.TWITTER_IDS).insert({
-				'ids': data.ids.join(' '),
+				ids: ids.join(' '),
 			});
 
 			await knex.destroy();
@@ -295,24 +321,22 @@ async function fetch(id: string) {
 		let count = 0;
 		const promises = Array.from(Array(5)).map(async () => {
 			do {
-				const id = data.ids.shift();
+				const id = ids.shift();
 
-				if (typeof id !== 'string') {
-					return;
-				}
+				if (typeof id !== 'string') { return; }
 
 				await sleep(100);
 
 				await fetch(id);
 			}
-			while (data.ids.length > 0);
+			while (ids.length > 0);
 
 			++count;
 		});
 
 		await Promise.all(promises);
 
-		console.log(`count: ${count} / ${data.ids.length}`);
+		console.log(`count: ${count} / ${ids.length}`);
 	}
 	catch (error) {
 		console.log(error);
