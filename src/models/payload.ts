@@ -25,6 +25,8 @@ interface TwitterFollowingListPayload {
 	type: RequestType.TWITTER_FOLLOWING_LIST;
 	params: {
 		cursor: string;
+		skip_status?: boolean;
+		include_user_entities?: boolean;
 	};
 }
 
