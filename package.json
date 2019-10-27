@@ -14,6 +14,7 @@
     "start:dev": "node ./dist/main.js",
     "fetch": "node ./dist/fetch.js",
     "download": "node ./dist/download.js",
+    "prebackup": "npm run build",
     "backup": "npm run fetch && npm run download"
   },
   "repository": {

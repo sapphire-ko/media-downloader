@@ -247,6 +247,22 @@ async function fetch(id: string) {
 	await knex.destroy();
 }
 
+function ids1(users: AccountTwitter[]) {
+	return users.map(x => x.id_str);
+}
+function ids2(users: AccountTwitter[]) {
+	const ids: string[] = [];
+	let skip = true;
+	for (const user of users) {
+		if (user.screen_name === 'ricounco') {
+			skip = false;
+		}
+		if (skip) { continue; }
+		ids.push(user.id_str);
+	}
+	return ids;
+}
+
 (async () => {
 	try {
 		Twitter.createInstance();
@@ -283,16 +299,8 @@ async function fetch(id: string) {
 		}
 		while (cursor !== '0');
 
-		// const ids: string[] = [];
-		// let skip = true;
-		// for (const user of users) {
-		// 	if (user.screen_name === 'ricounco') {
-		// 		skip = false;
-		// 	}
-		// 	if (skip) { continue; }
-		// 	ids.push(user.id_str);
-		// }
-		const ids = users.map(x => x.id_str);
+		const ids = ids1(users);
+		// const ids = ids2(users);
 
 		{
 			const knex = Knex({
