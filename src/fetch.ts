@@ -248,17 +248,50 @@ async function fetch(id: string) {
 }
 
 function ids1(users: AccountTwitter[]) {
-	return users.map(x => x.id_str);
+	const ids: string[] = [];
+	let skip = false;
+	for (const user of users) {
+		if (user.screen_name === 'riku_chin') {
+			skip = true;
+		}
+		if (skip) { continue; }
+		ids.push(user.id_str);
+	}
+	return ids;
 }
 function ids2(users: AccountTwitter[]) {
 	const ids: string[] = [];
 	let skip = true;
 	for (const user of users) {
-		if (user.screen_name === 'ricounco') {
+		if (user.screen_name === 'riku_chin') {
 			skip = false;
 		}
 		if (skip) { continue; }
 		ids.push(user.id_str);
+	}
+	return ids;
+}
+function ids3(data: { ids: string[] }) {
+	const ids: string[] = [];
+	let skip = false;
+	for (const x of data.ids) {
+		if (x === '518486749') {
+			skip = true;
+		}
+		if (skip) { continue; }
+		ids.push(x);
+	}
+	return ids;
+}
+function ids4(data: { ids: string[] }) {
+	const ids: string[] = [];
+	let skip = true;
+	for (const x of data.ids) {
+		if (x === '518486749') {
+			skip = false;
+		}
+		if (skip) { continue; }
+		ids.push(x);
 	}
 	return ids;
 }
@@ -277,30 +310,39 @@ function ids2(users: AccountTwitter[]) {
 		console.log(status.resources.friends['/friends/list']);
 		console.log(status.resources.search['/search/universal']);
 
-		let users: AccountTwitter[] = [];
-		let cursor = '';
-		do {
-			const data: {
-				users: AccountTwitter[];
-				next_cursor_str: string;
-				previous_cursor_str: string;
-			} = await sendRequest({
-				type: RequestType.TWITTER_FOLLOWING_LIST,
-				params: {
-					cursor,
-					skip_status: true,
-					include_user_entities: false,
-				},
-			});
-			users = users.concat(data.users);
-			cursor = data.next_cursor_str;
-			await sleep(100);
-			console.log('user count', users.length);
-		}
-		while (cursor !== '0');
+		// let users: AccountTwitter[] = [];
+		// let cursor = '';
+		// do {
+		// 	const data: {
+		// 		users: AccountTwitter[];
+		// 		next_cursor_str: string;
+		// 		previous_cursor_str: string;
+		// 	} = await sendRequest({
+		// 		type: RequestType.TWITTER_FOLLOWING_LIST,
+		// 		params: {
+		// 			cursor,
+		// 			skip_status: true,
+		// 			include_user_entities: false,
+		// 		},
+		// 	});
+		// 	users = users.concat(data.users);
+		// 	cursor = data.next_cursor_str;
+		// 	await sleep(100);
+		// 	console.log('user count', users.length);
+		// }
+		// while (cursor !== '0');
 
-		const ids = ids1(users);
+		const data = await sendRequest({
+			'type': RequestType.TWITTER_FOLLOWING_IDS,
+		}) as {
+			ids: string[];
+		};
+
+		// const ids = ids1(users);
 		// const ids = ids2(users);
+
+		const ids = ids3(data);
+		// const ids = ids4(data);
 
 		{
 			const knex = Knex({
