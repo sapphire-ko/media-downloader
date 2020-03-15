@@ -215,7 +215,7 @@ export class Puppeteer {
 					return;
 				}
 
-				const tweets = await response.json();
+				const tweets = await response.json() as Tweet[];
 				this.queue.push(tweets);
 			});
 

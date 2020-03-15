@@ -25,6 +25,14 @@ import {
 	sendRequest,
 } from '~/helpers';
 
+interface Medium {
+	id: string;
+	tweet_id: string;
+	url: string;
+	downloaded: boolean;
+	retry_count: number;
+}
+
 async function fetch(id: string) {
 	const knex = Knex({
 		'client': 'sqlite3',
@@ -126,13 +134,7 @@ async function fetch(id: string) {
 					'screen_name': screenName,
 					'max_id': maxId,
 				},
-			}) as {
-				modules: Array<{
-					status: {
-						data: Tweet;
-					};
-				}>;
-			};
+			}) as { modules: { status: { data: Tweet; }; }[]; };
 
 			const tweets: Tweet[] = [];
 			for (const module of data.modules) {
@@ -175,7 +177,7 @@ async function fetch(id: string) {
 					extended_entities: entities,
 				} = tweet;
 
-				const media = entities.media.map(medium => {
+				const media = entities.media.map((medium): Medium | null => {
 					let id: string | null = null;
 					let url: string | null = null;
 
@@ -207,7 +209,7 @@ async function fetch(id: string) {
 						'downloaded': false,
 						'retry_count': 0,
 					};
-				}).filter(x => x !== null);
+				}).filter((x): x is Medium => x !== null);
 
 				for (const medium of media) {
 					const rows = await knex(TableName.TWITTER_MEDIA).where({
