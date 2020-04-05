@@ -298,6 +298,13 @@ function ids4(data: { ids: string[] }) {
 	return ids;
 }
 
+function ids5(data: { ids: string[] }) {
+	return data.ids.slice(0, 1200);
+}
+function ids6(data: { ids: string[] }) {
+	return data.ids.slice(1100);
+}
+
 (async () => {
 	try {
 		Twitter.createInstance();
@@ -343,8 +350,11 @@ function ids4(data: { ids: string[] }) {
 		// const ids = ids1(users);
 		// const ids = ids2(users);
 
-		const ids = ids3(data);
+		// const ids = ids3(data);
 		// const ids = ids4(data);
+
+		const ids = ids5(data);
+		// const ids = ids6(data);
 
 		{
 			const knex = Knex({
