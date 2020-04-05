@@ -27,6 +27,7 @@ interface TwitterFollowingListPayload {
 		cursor: string;
 		skip_status?: boolean;
 		include_user_entities?: boolean;
+		screen_name?: string;
 	};
 }
 

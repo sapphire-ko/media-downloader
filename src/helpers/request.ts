@@ -19,7 +19,7 @@ import {
 } from '~/libs';
 
 function getServiceType(payload: RequestPayload): ServiceType {
-	switch(payload.type) {
+	switch (payload.type) {
 		case RequestType.TWITTER_VERIFY_CREDENTIALS:
 		case RequestType.TWITTER_RATE_LIMIT_STATUS:
 		case RequestType.TWITTER_USER:
@@ -36,7 +36,7 @@ function getServiceType(payload: RequestPayload): ServiceType {
 function getHeaders(payload: RequestPayload): AnyObject {
 	const serviceType = getServiceType(payload);
 
-	switch(serviceType) {
+	switch (serviceType) {
 		case ServiceType.TWITTER: {
 			const authentication = Authentication.getInstance();
 			const {
@@ -57,7 +57,7 @@ function getHeaders(payload: RequestPayload): AnyObject {
 }
 
 function getRequestMethod(payload: RequestPayload): RequestMethodType {
-	switch(payload.type) {
+	switch (payload.type) {
 		case RequestType.TWITTER_VERIFY_CREDENTIALS:
 		case RequestType.TWITTER_RATE_LIMIT_STATUS:
 		case RequestType.TWITTER_USER:
@@ -72,7 +72,7 @@ function getRequestMethod(payload: RequestPayload): RequestMethodType {
 }
 
 function getURL(payload: RequestPayload): string {
-	switch(payload.type) {
+	switch (payload.type) {
 		case RequestType.TWITTER_VERIFY_CREDENTIALS: {
 			return `${API_URL_TWITTER}/account/verify_credentials.json`;
 		}
@@ -98,8 +98,11 @@ function getURL(payload: RequestPayload): string {
 			const params: any = {
 				'count': 200,
 			};
-			if(payload.params.cursor !== '') {
+			if (payload.params.cursor !== '') {
 				params.cursor = payload.params.cursor;
+			}
+			if (payload.params.screen_name) {
+				params.screen_name = payload.params.screen_name;
 			}
 			const query = qs.stringify(params);
 			return `${API_URL_TWITTER}/friends/list.json?${query}`;
@@ -117,7 +120,7 @@ function getURL(payload: RequestPayload): string {
 				'include_ext_alt_text': 'true',
 				'include_reply_count': 'true',
 			};
-			if(payload.params.since_id !== '') {
+			if (payload.params.since_id !== '') {
 				params.since_id = payload.params.since_id;
 			}
 			const query = qs.stringify(params);
@@ -144,7 +147,7 @@ function getURL(payload: RequestPayload): string {
 				'user_id': user_id,
 			};
 
-			if(max_id !== '') {
+			if (max_id !== '') {
 				params.max_id = max_id;
 			}
 			const query = qs.stringify(params);
@@ -173,7 +176,7 @@ function getURL(payload: RequestPayload): string {
 			};
 
 			params.q = `from:${screen_name}`;
-			if(max_id !== '') {
+			if (max_id !== '') {
 				params.q += ` max_id:${max_id}`;
 			}
 
@@ -193,7 +196,7 @@ export async function sendRequest(payload: RequestPayload): Promise<any> {
 	try {
 		let response: Response | null = null;
 
-		switch(methodType) {
+		switch (methodType) {
 			case RequestMethodType.GET: {
 				response = await fetch(url, {
 					'method': 'get',
@@ -210,19 +213,19 @@ export async function sendRequest(payload: RequestPayload): Promise<any> {
 			}
 		}
 
-		if(response === null) {
+		if (response === null) {
 			throw new Error('failed to send request');
 		}
 
 		const data = await response.json();
 
-		if(response.status !== 200) {
+		if (response.status !== 200) {
 			throw new Error(response.statusText);
 		}
 
 		return data;
 	}
-	catch(error) {
+	catch (error) {
 		console.log(error);
 	}
 }
