@@ -108,6 +108,7 @@ export class Twitter {
 					'type': RequestType.TWITTER_HOME_TIMELINE,
 					'params': command.payload,
 				}) as Tweet[];
+				console.log(`tweets: ${tweets.length}`);
 				for(const tweet of tweets) {
 					if(tweet.retweeted_status !== undefined) {
 						continue;
