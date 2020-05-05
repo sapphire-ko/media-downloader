@@ -307,6 +307,8 @@ function ids6(data: { ids: string[] }) {
 
 (async () => {
 	try {
+		console.log(new Date());
+
 		Twitter.createInstance();
 
 		Authentication.createInstance();
