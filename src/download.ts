@@ -56,13 +56,13 @@ async function download(pathName: string, accountId: string) {
 
 	const rows = await knex(TableName.TWITTER_MEDIA).where({
 		'downloaded': false,
-	}) as Array<{
+	}) as {
 		id: string;
 		tweet_id: string;
 		url: string;
 		downloaded: boolean;
 		retry_count: number;
-	}>;
+	}[];
 
 	if (rows.length > 0) {
 		console.log(`${rows.length} ${accountId}`);
