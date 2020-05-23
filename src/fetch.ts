@@ -299,10 +299,10 @@ function ids4(data: { ids: string[] }) {
 }
 
 function ids5(data: { ids: string[] }) {
-	return data.ids.slice(0, 1200);
+	return data.ids.filter(x => parseInt(x[x.length - 2], 10) % 2 === 0);
 }
 function ids6(data: { ids: string[] }) {
-	return data.ids.slice(1100);
+	return data.ids.filter(x => parseInt(x[x.length - 2], 10) % 2 === 1);
 }
 
 (async () => {
@@ -349,14 +349,18 @@ function ids6(data: { ids: string[] }) {
 			ids: string[];
 		};
 
+		console.log('data.ids.length', data.ids.length);
+
 		// const ids = ids1(users);
 		// const ids = ids2(users);
 
 		// const ids = ids3(data);
 		// const ids = ids4(data);
 
-		const ids = ids5(data);
-		// const ids = ids6(data);
+		// const ids = ids5(data);
+		const ids = ids6(data);
+
+		console.log('ids.length', ids.length);
 
 		{
 			const knex = Knex({
