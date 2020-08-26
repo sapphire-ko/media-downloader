@@ -1,6 +1,4 @@
-import {
-	Tweet,
-} from '~/models';
+import { Tweet } from './twitter';
 
 export enum CommandType {
 	TWITTER_RATE_LIMIT_STATUS = 100001,

@@ -2,21 +2,14 @@ import fetch, {
 	Response,
 } from 'node-fetch';
 import qs from 'qs';
-
-import {
-	API_URL_TWITTER,
-} from '~/constants';
-
+import { API_URL_TWITTER } from '~/constants';
+import { Authentication } from '~/libs';
 import {
 	ServiceType,
 	RequestType,
 	RequestMethodType,
 	RequestPayload,
 } from '~/models';
-
-import {
-	Authentication,
-} from '~/libs';
 
 function getServiceType(payload: RequestPayload): ServiceType {
 	switch (payload.type) {
@@ -33,7 +26,7 @@ function getServiceType(payload: RequestPayload): ServiceType {
 	}
 }
 
-function getHeaders(payload: RequestPayload): AnyObject {
+function getHeaders(payload: RequestPayload) {
 	const serviceType = getServiceType(payload);
 
 	switch (serviceType) {

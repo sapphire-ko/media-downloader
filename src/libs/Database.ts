@@ -1,9 +1,6 @@
 import knex from 'knex';
-
-import {
-	TableName,
-} from '~/constants';
-
+import { TableName } from '~/constants';
+import { sleep } from '~/helpers';
 import {
 	CommandType,
 	CommandDatabase,
@@ -11,10 +8,7 @@ import {
 	CommandDatabaseInsertTweet,
 	CommandDatabaseInsertMedium,
 } from '~/models';
-
-import {
-	sleep,
-} from '~/helpers';
+import env from '../../env.json';
 
 export class Database {
 	private static instance: Database | null = null;
@@ -25,18 +19,18 @@ export class Database {
 	private knex: knex;
 
 	private constructor() {
-		this.knex = knex(__knex);
+		this.knex = knex(env.knex);
 	}
 
 	public static createInstance() {
-		if(this.instance !== null) {
+		if (this.instance !== null) {
 			throw new Error('cannot create instance');
 		}
 		this.instance = new Database();
 	}
 
 	public static getInstance(): Database {
-		if(this.instance === null) {
+		if (this.instance === null) {
 			throw new Error('instance is null');
 		}
 		return this.instance;
@@ -44,11 +38,11 @@ export class Database {
 
 	private async createTable<T extends TableName>(tableName: T) {
 		const exists = await this.knex.schema.hasTable(tableName);
-		if(exists === false) {
+		if (exists === false) {
 			await this.knex.schema.createTable(tableName, table => {
 				table.string('id').unique();
 
-				switch(tableName) {
+				switch (tableName) {
 					case TableName.TWITTER_ACCOUNTS: {
 						table.string('alias');
 						break;
@@ -100,7 +94,7 @@ export class Database {
 
 		const hasAccount = await this.hasAccount(id);
 
-		if(hasAccount === false) {
+		if (hasAccount === false) {
 			await this.knex(TableName.TWITTER_ACCOUNTS).insert({
 				'id': id,
 				'alias': '',
@@ -108,10 +102,10 @@ export class Database {
 		}
 	}
 
-	public async getAccounts(): Promise<Array<{
+	public async getAccounts(): Promise<{
 		id: string;
 		alias: string;
-	}>> {
+	}[]> {
 		return this.knex(TableName.TWITTER_ACCOUNTS);
 	}
 
@@ -130,7 +124,7 @@ export class Database {
 
 		const hasTweet = await this.hasTweet(tweet.id_str);
 
-		if(hasTweet === false) {
+		if (hasTweet === false) {
 			await this.knex(TableName.TWITTER_TWEETS).insert({
 				'id': tweet.id_str,
 				'account_id': tweet.user.id_str,
@@ -157,7 +151,7 @@ export class Database {
 
 		const hasMedium = await this.hasMedium(url);
 
-		if(hasMedium === false) {
+		if (hasMedium === false) {
 			await this.knex(TableName.TWITTER_MEDIA).insert({
 				'id': id,
 				'url': url,
@@ -169,14 +163,14 @@ export class Database {
 		}
 	}
 
-	public async getMedia(): Promise<Array<{
+	public async getMedia(): Promise<{
 		id: string;
 		url: string;
 		account_id: string;
 		tweet_id: string;
 		downloaded: boolean;
 		retry_count: number;
-	}>> {
+	}[]> {
 		const rows = await this.knex(TableName.TWITTER_MEDIA).where({
 			'downloaded': false,
 		});
@@ -209,7 +203,7 @@ export class Database {
 		do {
 			await sleep(10);
 
-			if(this.queue.length === 0) {
+			if (this.queue.length === 0) {
 				continue;
 			}
 
@@ -217,7 +211,7 @@ export class Database {
 
 			await this.process(command);
 		}
-		while(this.shouldProcess);
+		while (this.shouldProcess);
 	}
 
 	public async stop() {
@@ -225,7 +219,7 @@ export class Database {
 	}
 
 	private async process(command: CommandDatabase): Promise<true> {
-		switch(command.type) {
+		switch (command.type) {
 			case CommandType.DATABASE_INSERT_ACCOUNT: {
 				this.insertAccount(command.payload);
 				return true;

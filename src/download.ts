@@ -2,14 +2,13 @@ import fs from 'fs';
 import path from 'path';
 import url from 'url';
 import assert from 'assert';
-
 import request from 'request';
 import Knex from 'knex';
-
 import {
+	dataPath,
+	rootPath,
 	TableName,
 } from '~/constants';
-
 import {
 	sleep,
 	mkdir,
@@ -49,7 +48,7 @@ async function download(pathName: string, accountId: string) {
 	const knex = Knex({
 		'client': 'sqlite3',
 		'connection': {
-			'filename': path.resolve(__path.data, `${accountId}.sqlite`),
+			'filename': path.resolve(dataPath, `${accountId}.sqlite`),
 		},
 		'useNullAsDefault': true,
 	});
@@ -105,14 +104,14 @@ async function download(pathName: string, accountId: string) {
 
 (async () => {
 	try {
-		const downloadPath = path.resolve(__path.root, 'download');
+		const downloadPath = path.resolve(rootPath, 'download');
 		await mkdir(downloadPath);
 
 		const aPath = path.resolve(downloadPath, `${Date.now()}`);
 
 		await mkdir(aPath);
 
-		const files = (await fs.promises.readdir(__path.data)).filter(e => e.endsWith('.sqlite')).filter(e => {
+		const files = (await fs.promises.readdir(dataPath)).filter(e => e.endsWith('.sqlite')).filter(e => {
 			switch (e) {
 				case 'media_downloader.sqlite':
 				case 'ids.sqlite': {

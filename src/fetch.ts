@@ -1,29 +1,25 @@
 import path from 'path';
-
 import Knex from 'knex';
-
 import {
+	dataPath,
 	TableName,
-} from '~/constants';
-
+} from './constants';
 import {
 	RequestType,
 	RateLimitStatus,
 	AccountTwitter,
 	Tweet,
 	TwitterMediumType,
-} from '~/models';
-
+} from './models';
 import {
 	Authentication,
 	Twitter,
-} from '~/libs';
-
+} from './libs';
 import {
 	sleep,
-	mkdir,
 	sendRequest,
-} from '~/helpers';
+} from './helpers';
+import env from '../env.json';
 
 interface Medium {
 	id: string;
@@ -37,7 +33,7 @@ async function fetch(id: string) {
 	const knex = Knex({
 		'client': 'sqlite3',
 		'connection': {
-			'filename': path.resolve(__path.data, `${id}.sqlite`),
+			'filename': path.resolve(dataPath, `${id}.sqlite`),
 		},
 		'useNullAsDefault': true,
 	});
@@ -351,14 +347,26 @@ function ids6(data: { ids: string[] }) {
 
 		console.log('data.ids.length', data.ids.length);
 
-		// const ids = ids1(users);
-		// const ids = ids2(users);
+		const getIds = () => {
+			// const ids = ids1(users);
+			// const ids = ids2(users);
 
-		// const ids = ids3(data);
-		// const ids = ids4(data);
+			// const ids = ids3(data);
+			// const ids = ids4(data);
 
-		// const ids = ids5(data);
-		const ids = ids6(data);
+			switch (process.argv[2]) {
+				case 'a': {
+					return ids5(data);
+				}
+				case 'b': {
+					return ids6(data);
+				}
+				default: {
+					return [];
+				}
+			}
+		};
+		const ids = getIds();
 
 		console.log('ids.length', ids.length);
 
@@ -366,7 +374,7 @@ function ids6(data: { ids: string[] }) {
 			const knex = Knex({
 				'client': 'sqlite3',
 				'connection': {
-					'filename': path.resolve(__path.data, `ids.sqlite`),
+					'filename': path.resolve(dataPath, `ids.sqlite`),
 				},
 				'useNullAsDefault': true,
 			});

@@ -1,6 +1,4 @@
-import {
-	RequestType,
-} from '~/models';
+import { RequestType } from './request';
 
 interface TwitterVerifyCredentialsPayload {
 	type: RequestType.TWITTER_VERIFY_CREDENTIALS;

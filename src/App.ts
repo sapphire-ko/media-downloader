@@ -1,7 +1,8 @@
+import { dataPath } from './constants';
 import {
-	CommandType,
-} from '~/models';
-
+	mkdir,
+	sleep,
+} from './helpers';
 import {
 	Authentication,
 	Database,
@@ -9,15 +10,11 @@ import {
 	Puppeteer,
 	Twitter,
 } from '~/libs';
-
-import {
-	mkdir,
-	sleep,
-} from './helpers';
+import { CommandType } from '~/models';
 
 export class App {
 	public async initialize() {
-		await mkdir(__path.data);
+		await mkdir(dataPath);
 
 		{
 			Database.createInstance();
@@ -76,7 +73,7 @@ export class App {
 
 			await sleep(30000);
 		}
-		while(true);
+		while (true);
 	}
 
 	public async stop() {

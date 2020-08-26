@@ -1,6 +1,4 @@
-import {
-	ServiceType,
-} from '~/models';
+import { ServiceType } from './service';
 
 export interface ConfigurationTwitter {
 	type: ServiceType.TWITTER;

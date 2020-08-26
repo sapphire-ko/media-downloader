@@ -1,33 +1,29 @@
 import url from 'url';
-
 import puppeteer from 'puppeteer';
-
+import { sleep } from '~/helpers';
 import {
 	ServiceType,
 	Configuration,
 	Tweet,
 } from '~/models';
-
-import {
-	sleep,
-} from '~/helpers';
+import env from '../../env.json';
 
 export class Puppeteer {
 	private static instance: Puppeteer | null = null;
 
 	private browser: puppeteer.Browser | null = null;
 
-	private constructor() {}
+	private constructor() { }
 
 	public static createInstance() {
-		if(this.instance !== null) {
+		if (this.instance !== null) {
 			throw new Error('cannot create instance');
 		}
 		this.instance = new Puppeteer();
 	}
 
 	public static getInstance(): Puppeteer {
-		if(this.instance === null) {
+		if (this.instance === null) {
 			throw new Error('instance is not created');
 		}
 		return this.instance;
@@ -42,17 +38,17 @@ export class Puppeteer {
 				await page.focus(selector);
 				shouldWait = false;
 			}
-			catch(err) {
+			catch (err) {
 				shouldWait = true;
 			}
 		}
-		while(shouldWait);
+		while (shouldWait);
 	}
 
 	private clearInput(page: puppeteer.Page, selector: string) {
 		return page.evaluate((selector: string) => {
 			const field = document.querySelector(selector) as HTMLInputElement;
-			if(field === null) {
+			if (field === null) {
 				return;
 			}
 			field.value = '';
@@ -60,11 +56,11 @@ export class Puppeteer {
 	}
 
 	public async login(type: ServiceType): Promise<Configuration> {
-		if(this.browser === null) {
+		if (this.browser === null) {
 			throw new Error('browser is null');
 		}
 
-		switch(type) {
+		switch (type) {
 			case ServiceType.TWITTER: {
 				const page = await this.browser.newPage();
 
@@ -79,7 +75,7 @@ export class Puppeteer {
 				const {
 					username,
 					password,
-				} = __account.twitter;
+				} = env.account.twitter;
 
 				const usernameSelector = 'input[name="session[username_or_email]"]';
 				const passwordSelector = 'input[name="session[password]"]';
@@ -105,7 +101,7 @@ export class Puppeteer {
 							const usernameField = document.querySelector('input[name="session[username_or_email]"]') as HTMLInputElement;
 							const passwordField = document.querySelector('input[name="session[password]"]') as HTMLInputElement;
 
-							if(usernameField === null || passwordField === null) {
+							if (usernameField === null || passwordField === null) {
 								return null;
 							}
 							return {
@@ -114,15 +110,15 @@ export class Puppeteer {
 							};
 						});
 
-						if(values === null) {
+						if (values === null) {
 							continue;
 						}
 
-						if(values.username === username && values.password === password) {
+						if (values.username === username && values.password === password) {
 							shouldWait = false;
 						}
 					}
-					while(shouldWait);
+					while (shouldWait);
 				}
 
 				await page.keyboard.press('Enter');
@@ -168,7 +164,7 @@ export class Puppeteer {
 
 			console.log(`queue=${this.queue.length}`);
 
-			if(this.queue.length === 0) {
+			if (this.queue.length === 0) {
 				continue;
 			}
 
@@ -178,17 +174,17 @@ export class Puppeteer {
 
 			await page.evaluate(_ => {
 				const list = document.querySelector('#open-modal .js-column-scroller');
-				if(list === null) {
+				if (list === null) {
 					return;
 				}
 				list.scrollTop = list.scrollHeight;
 			});
 		}
-		while(this.shouldProcess);
+		while (this.shouldProcess);
 	}
 
 	public async fetchUserTimeline(screenName: string) {
-		if(this.browser === null) {
+		if (this.browser === null) {
 			throw new Error('browser is null');
 		}
 
@@ -206,12 +202,12 @@ export class Puppeteer {
 				const {
 					pathname,
 				} = url.parse(response.url());
-				if(pathname!.endsWith('statuses/user_timeline.json') !== true) {
+				if (pathname!.endsWith('statuses/user_timeline.json') !== true) {
 					return;
 				}
 
 				const request = response.request();
-				if(request.method() !== 'GET') {
+				if (request.method() !== 'GET') {
 					return;
 				}
 
@@ -236,7 +232,7 @@ export class Puppeteer {
 			await this.waitElement(page, tweetsSelector);
 			await page.click(tweetsSelector);
 		}
-		catch(error) {
+		catch (error) {
 			console.log(error);
 		}
 	}

@@ -1,17 +1,16 @@
-import {
-	ServiceType,
-	Configuration,
-} from '~/models';
-
-import {
-	Puppeteer,
-	Twitter,
-} from '~/libs';
-
+import { dataPath } from '~/constants';
 import {
 	readFile,
 	writeFile,
 } from '~/helpers';
+import {
+	Puppeteer,
+	Twitter,
+} from '~/libs';
+import {
+	ServiceType,
+	Configuration,
+} from '~/models';
 
 type Configurations = {
 	[P in ServiceType]: Configuration | null;
@@ -21,7 +20,7 @@ export class Authentication {
 	private static instance: Authentication | null = null;
 
 	private configurations: Configurations;
-	private filename = `${__path.data}/credentials.json`;
+	private filename = `${dataPath}/credentials.json`;
 
 	private constructor() {
 		this.configurations = {
