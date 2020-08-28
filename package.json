@@ -13,10 +13,8 @@
     "lint": "tslint -p ./tsconfig.json",
     "ts-node": "ts-node  -r tsconfig-paths/register",
     "start:dev": "npm run ts-node ./src/index.ts",
-    "download": "npm run ts-node ./src/download.ts",
     "fetch": "npm run ts-node ./src/fetch.ts",
-    "postfetch": "npm run download",
-    "backup": "npm run fetch a && sleep $((10 * 60)) && npm run fetch b"
+    "download": "npm run ts-node ./src/download.ts"
   },
   "repository": {
     "type": "git",
