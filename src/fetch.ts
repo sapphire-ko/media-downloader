@@ -188,7 +188,7 @@ async function fetch(id: string) {
 							url = medium.video_info.variants.filter(e => {
 								return e.content_type.startsWith('video');
 							}).sort((a, b) => {
-								return a.bitrate - b.bitrate;
+								return b.bitrate - a.bitrate;
 							})[0].url;
 							break;
 						}
