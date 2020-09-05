@@ -2,7 +2,7 @@ import fs from 'fs';
 import path from 'path';
 import url from 'url';
 import assert from 'assert';
-import request from 'request';
+import https from 'https';
 import Knex from 'knex';
 import {
 	dataPath,
@@ -30,14 +30,18 @@ async function downloadMedia(downloadPath: string, accountId: string, url: strin
 
 	const filePath = path.resolve(dirPath, name);
 
-	const size = await new Promise<number>((resolve, reject) => {
-		const stream = fs.createWriteStream(filePath);
-		let size = 0;
-		request(url).on('response', response => {
-			size = parseInt(response.headers['content-length']!, 10);
-		}).on('error', reject).on('close', () => {
-			resolve(size);
-		}).pipe(stream);
+	const size = await new Promise((resolve, reject) => {
+		https.get(url, response => {
+			if (response.statusCode !== 200) {
+				return reject(new Error(`${response.statusCode}`));
+			}
+			const stream = fs.createWriteStream(filePath);
+			response.pipe(stream);
+			const size = parseInt(response.headers['content-length']!, 10);
+			stream.on('finish', () => {
+				resolve(size);
+			});
+		});
 	});
 
 	const stats = await fs.promises.lstat(filePath);

@@ -1,8 +1,8 @@
 import fs from 'fs';
 import path from 'path';
 import url from 'url';
+import https from 'https';
 import assert from 'assert';
-import request from 'request';
 import { dataPath } from '~/constants';
 import {
 	mkdir,
@@ -44,14 +44,18 @@ export class Downloader {
 
 		const filePath = path.resolve(dataPath, accountId, name);
 
-		const size = await new Promise<number>((resolve, reject) => {
-			let size = 0;
-			const stream = fs.createWriteStream(filePath);
-			request(url).on('response', response => {
-				size = parseInt(response.headers['content-length']!, 10);
-			}).on('close', () => {
-				resolve(size);
-			}).on('error', reject).pipe(stream);
+		const size = await new Promise((resolve, reject) => {
+			https.get(url, response => {
+				if (response.statusCode !== 200) {
+					return reject(new Error(`${response.statusCode}`));
+				}
+				const stream = fs.createWriteStream(filePath);
+				response.pipe(stream);
+				const size = parseInt(response.headers['content-length']!, 10);
+				stream.on('finish', () => {
+					resolve(size);
+				});
+			});
 		});
 
 		const stats = await fs.promises.lstat(filePath);
