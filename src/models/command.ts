@@ -48,7 +48,6 @@ export interface CommandDatabaseInsertTweet {
 export interface CommandDatabaseInsertMedium {
 	type: CommandType.DATABASE_INSERT_MEDIUM;
 	payload: {
-		id: string;
 		url: string;
 		accountId: string;
 		tweetId: string;

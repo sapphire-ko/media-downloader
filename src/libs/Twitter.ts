@@ -155,7 +155,6 @@ export class Twitter {
 							database.pushCommand({
 								'type': CommandType.DATABASE_INSERT_MEDIUM,
 								'payload': {
-									'id': id,
 									'url': url,
 									'accountId': tweet.user.id_str,
 									'tweetId': tweet.id_str,

@@ -66,16 +66,16 @@ export class Downloader {
 
 		for (const medium of media) {
 			const {
-				id,
-				account_id: accountId,
+				account_id,
 				url,
 				retry_count: retryCount,
 			} = medium;
 
 			try {
-				await this.download(accountId, url);
+				await this.download(account_id, url);
 				await database.updateMedium({
-					'id': id,
+					url,
+					account_id,
 					'downloaded': true,
 					'retryCount': retryCount,
 				});
@@ -83,7 +83,8 @@ export class Downloader {
 			catch (error) {
 				console.log(error);
 				await database.updateMedium({
-					'id': id,
+					url,
+					account_id,
 					'downloaded': false,
 					'retryCount': retryCount + 1,
 				});

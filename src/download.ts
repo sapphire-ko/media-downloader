@@ -56,7 +56,6 @@ async function download(pathName: string, accountId: string) {
 	const rows = await knex(TableName.TWITTER_MEDIA).where({
 		'downloaded': false,
 	}) as {
-		id: string;
 		tweet_id: string;
 		url: string;
 		downloaded: boolean;
@@ -83,7 +82,7 @@ async function download(pathName: string, accountId: string) {
 			await sleep(10);
 
 			await knex(TableName.TWITTER_MEDIA).where({
-				'id': row.id,
+				url: row.url,
 			}).update({
 				'downloaded': true,
 			});
@@ -92,7 +91,7 @@ async function download(pathName: string, accountId: string) {
 			await sleep(10);
 
 			await knex(TableName.TWITTER_MEDIA).where({
-				'id': row.id,
+				url: row.url,
 			}).update({
 				'retry_count': row.retry_count + 1,
 			});

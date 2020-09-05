@@ -40,14 +40,14 @@ export class Database {
 		const exists = await this.knex.schema.hasTable(tableName);
 		if (exists === false) {
 			await this.knex.schema.createTable(tableName, table => {
-				table.string('id').unique();
-
 				switch (tableName) {
 					case TableName.TWITTER_ACCOUNTS: {
+						table.string('id').unique();
 						table.string('alias');
 						break;
 					}
 					case TableName.TWITTER_TWEETS: {
+						table.string('id').unique();
 						table.string('account_id').notNullable();
 						table.text('data').notNullable();
 						break;
@@ -61,7 +61,6 @@ export class Database {
 						break;
 					}
 				}
-
 				table.timestamps(true, true);
 			});
 		}
@@ -143,7 +142,6 @@ export class Database {
 
 	private async insertMedium(params: CommandDatabaseInsertMedium['payload']) {
 		const {
-			id,
 			url,
 			accountId,
 			tweetId,
@@ -153,7 +151,6 @@ export class Database {
 
 		if (hasMedium === false) {
 			await this.knex(TableName.TWITTER_MEDIA).insert({
-				'id': id,
 				'url': url,
 				'account_id': accountId,
 				'tweet_id': tweetId,
@@ -181,18 +178,21 @@ export class Database {
 	}
 
 	public async updateMedium(params: {
-		id: string;
+		account_id: string;
+		url: string;
 		downloaded: boolean;
 		retryCount: number;
 	}) {
 		const {
-			id,
+			account_id,
+			url,
 			downloaded,
 			retryCount,
 		} = params;
 
 		await this.knex(TableName.TWITTER_MEDIA).where({
-			'id': id,
+			account_id,
+			url,
 		}).update({
 			'downloaded': downloaded,
 			'retry_count': retryCount,

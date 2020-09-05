@@ -19,7 +19,6 @@ import {
 	sleep,
 	sendRequest,
 } from './helpers';
-import env from '../env.json';
 
 interface Medium {
 	id: string;
@@ -64,7 +63,6 @@ async function fetch(id: string) {
 		const exists = await knex.schema.hasTable(TableName.TWITTER_MEDIA);
 		if (exists === false) {
 			await knex.schema.createTable(TableName.TWITTER_MEDIA, table => {
-				table.string('id').primary().unique().notNullable();
 				table.string('tweet_id').notNullable();
 				table.string('url').notNullable();
 				table.boolean('downloaded').notNullable();
@@ -209,7 +207,7 @@ async function fetch(id: string) {
 
 				for (const medium of media) {
 					const rows = await knex(TableName.TWITTER_MEDIA).where({
-						'id': medium!.id,
+						'url': medium.url,
 					});
 
 					if (rows.length > 0) {

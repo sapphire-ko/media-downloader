@@ -14,11 +14,11 @@ interface TwitterMediumPhoto {
 interface TwitterMediumVideo {
 	type: TwitterMediumType.VIDEO;
 	video_info: {
-		variants: Array<{
+		variants: {
 			bitrate: number;
 			content_type: string;
 			url: string;
-		}>;
+		}[];
 	};
 }
 
@@ -30,7 +30,7 @@ type TwitterMedium = (
 export type AccountTwitter = Twitter.User;
 export type Tweet = Twitter.Status & {
 	extended_entities?: {
-		media: Array<Twitter.MediaEntity & TwitterMedium>;
+		media: (Twitter.MediaEntity & TwitterMedium)[];
 	};
 };
 
