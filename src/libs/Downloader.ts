@@ -56,7 +56,7 @@ export class Downloader {
 
 		const stats = await fs.promises.lstat(filePath);
 
-		assert(stats.size === size, 'file did not downloaded properly');
+		assert(stats.size === size, `file did not downloaded properly ${stats.size} ${size} ${url}`);
 	}
 
 	public async downloadMedia() {

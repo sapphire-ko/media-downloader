@@ -41,7 +41,7 @@ async function downloadMedia(downloadPath: string, accountId: string, url: strin
 	});
 
 	const stats = await fs.promises.lstat(filePath);
-	assert(stats.size === size, 'file did not downloaded properly');
+	assert(stats.size === size, `file did not downloaded properly ${stats.size} ${size} ${url}`);
 }
 
 async function download(pathName: string, accountId: string) {
