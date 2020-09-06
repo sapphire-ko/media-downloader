@@ -21,7 +21,6 @@ import {
 } from './helpers';
 
 interface Medium {
-	id: string;
 	tweet_id: string;
 	url: string;
 	downloaded: boolean;
@@ -172,32 +171,30 @@ async function fetch(id: string) {
 				} = tweet;
 
 				const media = entities.media.map((medium): Medium | null => {
-					let id: string | null = null;
-					let url: string | null = null;
-
-					switch (medium.type) {
-						case TwitterMediumType.PHOTO: {
-							id = medium.id_str;
-							url = `${medium.media_url_https}:orig`;
-							break;
-						}
-						case TwitterMediumType.VIDEO: {
-							id = medium.id_str;
-							url = medium.video_info.variants.filter(e => {
-								return e.content_type.startsWith('video');
-							}).sort((a, b) => {
-								return b.bitrate - a.bitrate;
-							})[0].url;
-							break;
+					const getUrl = () => {
+						switch (medium.type) {
+							case TwitterMediumType.PHOTO: {
+								return `${medium.media_url_https}:orig`;
+							}
+							case TwitterMediumType.VIDEO: {
+								return medium.video_info.variants.filter(e => {
+									return e.content_type.startsWith('video');
+								}).sort((a, b) => {
+									return b.bitrate - a.bitrate;
+								})[0].url;
+							}
+							default: {
+								return null;
+							}
 						}
 					}
+					const url = getUrl();
 
-					if (id === null || url === null) {
+					if (url === null) {
 						return null;
 					}
 
 					return {
-						'id': id,
 						'tweet_id': tweet.id_str,
 						'url': url,
 						'downloaded': false,
