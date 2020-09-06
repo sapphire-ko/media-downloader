@@ -52,6 +52,9 @@ export class Downloader {
 				const stream = fs.createWriteStream(filePath);
 				response.pipe(stream);
 				const size = parseInt(response.headers['content-length']!, 10);
+				if (isNaN(size)) {
+					console.log('response.headers', response.headers);
+				}
 				stream.on('finish', () => {
 					resolve(size);
 				});
