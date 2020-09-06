@@ -47,6 +47,9 @@ export class Downloader {
 		const size = await new Promise((resolve, reject) => {
 			https.get(url, response => {
 				if (response.statusCode !== 200) {
+					if (response.statusCode !== 404) {
+						console.log(`response code: ${response.statusCode} ${url}`);
+					}
 					return reject(new Error(`${response.statusCode}`));
 				}
 				const stream = fs.createWriteStream(filePath);
