@@ -1,15 +1,13 @@
-import {
-	promises as fsPromises,
-} from 'fs';
+import fs from 'fs';
 
 export async function mkdir(dirPath: string) {
 	try {
-		await fsPromises.lstat(dirPath);
+		await fs.promises.lstat(dirPath);
 	}
 	catch(error) {
 		switch(error.code) {
 			case 'ENOENT': {
-				await fsPromises.mkdir(dirPath);
+				await fs.promises.mkdir(dirPath);
 				break;
 			}
 			default: {
@@ -21,10 +19,10 @@ export async function mkdir(dirPath: string) {
 }
 
 export async function readFile(filePath: string): Promise<string> {
-	const buffer = await fsPromises.readFile(filePath);
+	const buffer = await fs.promises.readFile(filePath);
 	return buffer.toString();
 }
 
 export async function writeFile(filePath: string, data: string) {
-	await fsPromises.writeFile(filePath, data);
+	await fs.promises.writeFile(filePath, data);
 }

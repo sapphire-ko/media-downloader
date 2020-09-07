@@ -1,13 +1,11 @@
-import fs from 'fs';
 import path from 'path';
 import url from 'url';
-import https from 'https';
-import assert from 'assert';
 import { dataPath } from '~/constants';
 import {
+	download,
+	log,
 	mkdir,
 	sleep,
-	log,
 } from '~/helpers';
 import { Database } from '~/libs';
 
@@ -55,34 +53,7 @@ export class Downloader {
 
 		const filePath = path.resolve(dataPath, accountId, name);
 
-		const size = await new Promise((resolve, reject) => {
-			https.get(url, response => {
-				if (response.statusCode !== 200) {
-					const codes = [
-						403,
-						404,
-						// 500,
-					];
-					if (!codes.includes(response.statusCode!)) {
-						log(`response code`, response.statusCode, accountId, tweetId, url);
-					}
-					return reject(new Error(`${response.statusCode}`));
-				}
-				const stream = fs.createWriteStream(filePath);
-				response.pipe(stream);
-				const size = parseInt(response.headers['content-length']!, 10);
-				if (isNaN(size)) {
-					log(`response.headers`, response.headers);
-				}
-				stream.on('finish', () => {
-					resolve(size);
-				});
-			});
-		});
-
-		const stats = await fs.promises.lstat(filePath);
-
-		assert(stats.size === size, `file did not downloaded properly ${stats.size} ${size} ${url}`);
+		await download(url, filePath);
 	}
 
 	public async downloadMedia() {
@@ -112,7 +83,8 @@ export class Downloader {
 				});
 			}
 			catch (error) {
-				console.log(error);
+				log(error.message, account_id, tweet_id, url);
+
 				await database.updateMedium({
 					url,
 					account_id,
