@@ -1,6 +1,6 @@
 import url from 'url';
 import puppeteer from 'puppeteer';
-import { sleep } from '~/helpers';
+import { sleep, log } from '~/helpers';
 import {
 	ServiceType,
 	Configuration,
@@ -162,7 +162,7 @@ export class Puppeteer {
 		do {
 			await sleep(100);
 
-			console.log(`queue=${this.queue.length}`);
+			log(`queue=${this.queue.length}`);
 
 			if (this.queue.length === 0) {
 				continue;
@@ -170,7 +170,7 @@ export class Puppeteer {
 
 			const tweets = this.queue.shift()!;
 
-			console.log(tweets.length);
+			log(tweets.length);
 
 			await page.evaluate(_ => {
 				const list = document.querySelector('#open-modal .js-column-scroller');

@@ -10,6 +10,7 @@ import {
 	RequestMethodType,
 	RequestPayload,
 } from '~/models';
+import { log } from './log';
 
 function getServiceType(payload: RequestPayload): ServiceType {
 	switch (payload.type) {
@@ -184,7 +185,7 @@ export async function sendRequest(payload: RequestPayload): Promise<any> {
 	const methodType = getRequestMethod(payload);
 	const url = getURL(payload);
 
-	console.info(payload);
+	log(JSON.stringify(payload));
 
 	try {
 		let response: Response | null = null;

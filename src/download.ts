@@ -14,11 +14,30 @@ import {
 	mkdir,
 } from '~/helpers';
 
+interface Media {
+	tweet_id: string;
+	url: string;
+	downloaded: boolean;
+	retry_count: number;
+}
+
 function parseURL(value: string) {
 	return url.parse(value);
 }
 
-async function downloadMedia(downloadPath: string, accountId: string, url: string) {
+async function downloadMedia(params: {
+	downloadPath: string;
+	accountId: string;
+	tweetId: string;
+	url: string;
+}) {
+	const {
+		downloadPath,
+		accountId,
+		tweetId,
+		url,
+	} = params;
+
 	const dirPath = path.resolve(downloadPath, accountId);
 	await mkdir(dirPath);
 
@@ -33,8 +52,13 @@ async function downloadMedia(downloadPath: string, accountId: string, url: strin
 	const size = await new Promise((resolve, reject) => {
 		https.get(url, response => {
 			if (response.statusCode !== 200) {
-				if (response.statusCode !== 404) {
-					console.log(`response code: ${response.statusCode} ${url}`);
+				const codes = [
+					403,
+					404,
+					// 500,
+				];
+				if (!codes.includes(response.statusCode!)) {
+					console.log(`response code: ${response.statusCode} ${accountId} ${tweetId} ${url}`);
 				}
 				return reject(new Error(`${response.statusCode}`));
 			}
@@ -51,7 +75,17 @@ async function downloadMedia(downloadPath: string, accountId: string, url: strin
 	assert(stats.size === size, `file did not downloaded properly ${stats.size} ${size} ${url}`);
 }
 
-async function download(pathName: string, accountId: string) {
+async function download(params: {
+	index: number;
+	downloadPath: string;
+	accountId: string;
+}) {
+	const {
+		index,
+		downloadPath,
+		accountId,
+	} = params;
+
 	const knex = Knex({
 		'client': 'sqlite3',
 		'connection': {
@@ -60,18 +94,18 @@ async function download(pathName: string, accountId: string) {
 		'useNullAsDefault': true,
 	});
 
-	const rows = await knex(TableName.TWITTER_MEDIA).where({
-		'downloaded': false,
-	}) as {
-		tweet_id: string;
-		url: string;
-		downloaded: boolean;
-		retry_count: number;
-	}[];
+	const rows: Media[] = await knex(TableName.TWITTER_MEDIA)
+		.where({
+			downloaded: false,
+		});
 
 	if (rows.length > 0) {
-		console.log(`${rows.length} ${accountId}`);
+		console.log(`[${index}] ${rows.length} ${accountId}`);
 	}
+
+	let totalCount = 0;
+	let successCount = 0;
+	let failureCount = 0;
 
 	for (const row of rows) {
 		if (row.downloaded === true) {
@@ -84,26 +118,35 @@ async function download(pathName: string, accountId: string) {
 		await sleep(10);
 
 		try {
-			await downloadMedia(pathName, accountId, row.url);
-
-			await sleep(10);
+			await downloadMedia({
+				downloadPath,
+				accountId,
+				tweetId: row.tweet_id,
+				url: row.url,
+			});
 
 			await knex(TableName.TWITTER_MEDIA).where({
 				url: row.url,
 			}).update({
 				'downloaded': true,
 			});
+
+			++successCount;
 		}
 		catch (error) {
-			await sleep(10);
-
 			await knex(TableName.TWITTER_MEDIA).where({
 				url: row.url,
 			}).update({
 				'retry_count': row.retry_count + 1,
 			});
+
+			++failureCount;
 		}
+
+		++totalCount;
 	}
+
+	console.log(`[${index}] ${successCount} ${failureCount} ${totalCount} ${rows.length} ${accountId}`);
 
 	await knex.destroy();
 }
@@ -117,20 +160,31 @@ async function download(pathName: string, accountId: string) {
 
 		await mkdir(aPath);
 
-		const files = (await fs.promises.readdir(dataPath)).filter(e => e.endsWith('.sqlite')).filter(e => {
-			switch (e) {
-				case 'media_downloader.sqlite':
-				case 'ids.sqlite': {
+		const getFiles = async () => {
+			const files = await fs.promises.readdir(dataPath);
+			return files.filter(x => {
+				if (!x.endsWith(`.sqlite`)) {
 					return false;
 				}
-				default: {
-					return true;
+				if (x === 'media_downloader.sqlite') {
+					return false;
 				}
-			}
-		});
+				if (x === 'ids.sqlite') {
+					return false;
+				}
+				return true;
+			});
+		};
+		const files = await getFiles();
 
-		let count = 0;
-		const promises = Array.from(Array(5)).map(async () => {
+		const PROMISE_COUNT = 5;
+
+		const count = Object.fromEntries(
+			Array.from({ length: PROMISE_COUNT }).map((_, i) => {
+				return [i, 0];
+			}),
+		);
+		const promises = Array.from({ length: PROMISE_COUNT }).map(async (_, i) => {
 			do {
 				const file = files.shift();
 
@@ -141,16 +195,20 @@ async function download(pathName: string, accountId: string) {
 				await sleep(10);
 
 				const id = file.split('.').shift()!;
-				await download(aPath, id);
+				await download({
+					index: i,
+					downloadPath: aPath,
+					accountId: id,
+				});
 
-				++count;
+				++count[i];
 			}
 			while (files.length > 0);
 		});
 
 		await Promise.all(promises);
 
-		console.log(`count: ${count} / ${files.length}`);
+		console.log(`count: ${JSON.stringify(count, null, 2)}`);
 	}
 	catch (error) {
 		console.trace(error);

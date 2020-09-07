@@ -7,6 +7,7 @@ import { dataPath } from '~/constants';
 import {
 	mkdir,
 	sleep,
+	log,
 } from '~/helpers';
 import { Database } from '~/libs';
 
@@ -33,7 +34,17 @@ export class Downloader {
 		return this.instance;
 	}
 
-	private async download(accountId: string, url: string) {
+	private async download(params: {
+		accountId: string;
+		tweetId: string;
+		url: string;
+	}) {
+		const {
+			accountId,
+			tweetId,
+			url,
+		} = params;
+
 		await mkdir(`${dataPath}/${accountId}`);
 
 		let name = parseURL(url).pathname!;
@@ -47,8 +58,13 @@ export class Downloader {
 		const size = await new Promise((resolve, reject) => {
 			https.get(url, response => {
 				if (response.statusCode !== 200) {
-					if (response.statusCode !== 404) {
-						console.log(`response code: ${response.statusCode} ${url}`);
+					const codes = [
+						403,
+						404,
+						// 500,
+					];
+					if (!codes.includes(response.statusCode!)) {
+						log(`response code: ${response.statusCode} ${accountId} ${tweetId} ${url}`);
 					}
 					return reject(new Error(`${response.statusCode}`));
 				}
@@ -56,7 +72,7 @@ export class Downloader {
 				response.pipe(stream);
 				const size = parseInt(response.headers['content-length']!, 10);
 				if (isNaN(size)) {
-					console.log('response.headers', response.headers);
+					log('response.headers', JSON.stringify(response.headers));
 				}
 				stream.on('finish', () => {
 					resolve(size);
@@ -77,12 +93,17 @@ export class Downloader {
 		for (const medium of media) {
 			const {
 				account_id,
+				tweet_id,
 				url,
 				retry_count: retryCount,
 			} = medium;
 
 			try {
-				await this.download(account_id, url);
+				await this.download({
+					accountId: account_id,
+					tweetId: tweet_id,
+					url,
+				});
 				await database.updateMedium({
 					url,
 					account_id,

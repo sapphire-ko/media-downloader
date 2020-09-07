@@ -9,6 +9,7 @@ import {
 } from '~/libs';
 
 import {
+	log,
 	sleep,
 	sendRequest,
 } from '~/helpers';
@@ -38,7 +39,7 @@ import {
 			previous_cursor_str: string;
 		};
 
-		console.log(list.users.length);
+		log(list.users.length);
 
 		users = users.concat(list.users);
 
@@ -49,8 +50,7 @@ import {
 		}
 	}
 	while(true);
-
-	console.log(JSON.stringify(users.map(user => {
+	log(JSON.stringify(users.map(user => {
 		return {
 			'id': user.id_str,
 			'screen_name': user.screen_name,
