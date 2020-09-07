@@ -204,6 +204,7 @@ async function download(params: {
 				++count[i];
 			}
 			while (files.length > 0);
+			console.log(`[${i}] done`);
 		});
 
 		await Promise.all(promises);
