@@ -137,7 +137,7 @@ async function fetch(id: string) {
 				tweets.push(module.status.data);
 			}
 
-			console.log(tweets.length);
+			console.log(`tweets.length`, tweets.length);
 
 			for (const tweet of tweets) {
 				await sleep(5);
@@ -363,7 +363,7 @@ function ids6(data: { ids: string[] }) {
 		};
 		const ids = getIds();
 
-		console.log('ids.length', ids.length);
+		console.log(`ids.length`, ids.length);
 
 		{
 			const knex = Knex({
@@ -407,7 +407,7 @@ function ids6(data: { ids: string[] }) {
 
 		await Promise.all(promises);
 
-		console.log(`count: ${count} / ${ids.length}`);
+		console.log(`done`);
 	}
 	catch (error) {
 		console.log(error);

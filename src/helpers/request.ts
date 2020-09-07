@@ -185,7 +185,7 @@ export async function sendRequest(payload: RequestPayload): Promise<any> {
 	const methodType = getRequestMethod(payload);
 	const url = getURL(payload);
 
-	log(JSON.stringify(payload));
+	log(payload);
 
 	try {
 		let response: Response | null = null;

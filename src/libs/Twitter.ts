@@ -109,7 +109,7 @@ export class Twitter {
 					'type': RequestType.TWITTER_HOME_TIMELINE,
 					'params': command.payload,
 				}) as Tweet[];
-				log(`tweets: ${tweets.length}`);
+				log(`tweets`, tweets.length);
 				for(const tweet of tweets) {
 					if(tweet.retweeted_status !== undefined) {
 						continue;

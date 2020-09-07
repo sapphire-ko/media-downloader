@@ -64,7 +64,7 @@ export class Downloader {
 						// 500,
 					];
 					if (!codes.includes(response.statusCode!)) {
-						log(`response code: ${response.statusCode} ${accountId} ${tweetId} ${url}`);
+						log(`response code`, response.statusCode, accountId, tweetId, url);
 					}
 					return reject(new Error(`${response.statusCode}`));
 				}
@@ -72,7 +72,7 @@ export class Downloader {
 				response.pipe(stream);
 				const size = parseInt(response.headers['content-length']!, 10);
 				if (isNaN(size)) {
-					log('response.headers', JSON.stringify(response.headers));
+					log(`response.headers`, response.headers);
 				}
 				stream.on('finish', () => {
 					resolve(size);

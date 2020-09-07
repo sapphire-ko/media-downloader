@@ -58,7 +58,7 @@ async function downloadMedia(params: {
 					// 500,
 				];
 				if (!codes.includes(response.statusCode!)) {
-					console.log(`response code: ${response.statusCode} ${accountId} ${tweetId} ${url}`);
+					console.log(`response code`, response.statusCode, accountId, tweetId, url);
 				}
 				return reject(new Error(`${response.statusCode}`));
 			}
@@ -100,7 +100,7 @@ async function download(params: {
 		});
 
 	if (rows.length > 0) {
-		console.log(`[${index}] ${rows.length} ${accountId}`);
+		console.log(`[${index}]`, rows.length, accountId);
 	}
 
 	let totalCount = 0;
@@ -134,6 +134,7 @@ async function download(params: {
 			++successCount;
 		}
 		catch (error) {
+			console.log(`[${index}]`, error.message, accountId, row.tweet_id, row.url);
 			await knex(TableName.TWITTER_MEDIA).where({
 				url: row.url,
 			}).update({
@@ -146,7 +147,9 @@ async function download(params: {
 		++totalCount;
 	}
 
-	console.log(`[${index}] ${successCount} ${failureCount} ${totalCount} ${rows.length} ${accountId}`);
+	if (rows.length > 0) {
+		console.log(`[${index}]`, successCount, failureCount, totalCount, rows.length, accountId);
+	}
 
 	await knex.destroy();
 }
@@ -204,12 +207,12 @@ async function download(params: {
 				++count[i];
 			}
 			while (files.length > 0);
-			console.log(`[${i}] done`);
+			console.log(`[${i}]`, `done`);
 		});
 
 		await Promise.all(promises);
 
-		console.log(`count: ${JSON.stringify(count, null, 2)}`);
+		console.log(`count`, count);
 	}
 	catch (error) {
 		console.trace(error);

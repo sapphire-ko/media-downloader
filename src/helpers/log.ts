@@ -1,4 +1,4 @@
-export const log = (...message: (string | number)[]) => {
+export const log = (...message: any[]) => {
 	const date = new Date();
-	console.log(`[${date.toISOString()}] ${message.join(' ')}`);
+	console.log(date, ...message);
 };
