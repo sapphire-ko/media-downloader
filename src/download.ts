@@ -113,6 +113,8 @@ async function process(params: {
 	}
 
 	await knex.destroy();
+
+	return successCount;
 }
 
 (async () => {
@@ -141,11 +143,7 @@ async function process(params: {
 
 		const PROMISE_COUNT = 5;
 
-		const count = Object.fromEntries(
-			Array.from({ length: PROMISE_COUNT }).map((_, i) => {
-				return [i, 0];
-			}),
-		);
+		let count = 0;
 		const promises = Array.from({ length: PROMISE_COUNT }).map(async (_, i) => {
 			do {
 				const filename = filenames.shift();
@@ -157,19 +155,16 @@ async function process(params: {
 				await sleep(10);
 
 				const id = filename.split('.').shift()!;
-				await process({
+				count += await process({
 					index: i,
 					downloadPath: aPath,
 					accountId: id,
 				});
-
-				++count[i];
 			}
 			while (filenames.length > 0);
 
 			console.log(`[${i}]`, `done`);
 		});
-
 		await Promise.all(promises);
 
 		console.log(`count`, count);
