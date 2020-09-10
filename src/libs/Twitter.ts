@@ -1,4 +1,13 @@
 import {
+	log,
+	sleep,
+	sendRequest,
+} from '~/helpers';
+import {
+	Authentication,
+	Database,
+} from '~/libs';
+import {
 	ServiceType,
 	CommandType,
 	CommandTwitter,
@@ -8,17 +17,6 @@ import {
 	RequestPayloadTwitter,
 	RateLimitStatus,
 } from '~/models';
-
-import {
-	Authentication,
-	Database,
-} from '~/libs';
-
-import {
-	log,
-	sleep,
-	sendRequest,
-} from '~/helpers';
 
 export class Twitter {
 	private static instance: Twitter | null = null;
@@ -78,6 +76,8 @@ export class Twitter {
 	}
 
 	private async process(command: CommandTwitter): Promise<true> {
+		log('twitter', 'process', command.type);
+
 		switch(command.type) {
 			case CommandType.TWITTER_RATE_LIMIT_STATUS: {
 				const status = await this.sendRequest({

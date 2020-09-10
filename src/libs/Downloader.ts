@@ -37,6 +37,8 @@ export class Downloader {
 		tweetId: string;
 		url: string;
 	}) {
+		log('downloader', 'download');
+
 		const {
 			accountId,
 			tweetId,
@@ -57,6 +59,8 @@ export class Downloader {
 	}
 
 	public async downloadMedia() {
+		log('downloader', 'downloadMedia');
+
 		const database = Database.getInstance();
 
 		const media = await database.getMedia();
