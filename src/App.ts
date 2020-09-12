@@ -16,11 +16,9 @@ export class App {
 	public async initialize() {
 		await mkdir(dataPath);
 
-		{
-			Database.createInstance();
-			const database = Database.getInstance();
-			await database.initialize();
-		}
+		Database.createInstance();
+		const database = Database.getInstance();
+		await database.initialize();
 
 		// {
 		// 	Puppeteer.createInstance();
@@ -28,11 +26,7 @@ export class App {
 		// 	await puppeteer.initialize();
 		// }
 
-		{
-			Twitter.createInstance();
-			const twitter = Twitter.getInstance();
-			await twitter.initialize();
-		}
+		Twitter.createInstance();
 
 		{
 			Authentication.createInstance();
@@ -40,29 +34,23 @@ export class App {
 			await authentication.initialize();
 		}
 
-		{
-			Downloader.createInstance();
-		}
+		Downloader.createInstance();
 	}
 
 	public async start() {
-		const database = Database.getInstance();
-		database.start();
-
 		const twitter = Twitter.getInstance();
-		twitter.start();
 
 		const downloader = Downloader.getInstance();
 
-		twitter.pushCommand({
+		await twitter.process({
 			'type': CommandType.TWITTER_FOLLOWING_IDS,
 		});
-		twitter.pushCommand({
+		await twitter.process({
 			'type': CommandType.TWITTER_RATE_LIMIT_STATUS,
 		});
 
 		do {
-			twitter.pushCommand({
+			await twitter.process({
 				'type': CommandType.TWITTER_HOME_TIMELINE,
 				'payload': {
 					'since_id': '',
@@ -74,17 +62,5 @@ export class App {
 			await sleep(30000);
 		}
 		while (true);
-	}
-
-	public async stop() {
-		{
-			const database = Database.getInstance();
-			database.stop();
-		}
-
-		{
-			const twitter = Twitter.getInstance();
-			twitter.stop();
-		}
 	}
 }

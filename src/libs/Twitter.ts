@@ -21,9 +21,6 @@ import {
 export class Twitter {
 	private static instance: Twitter | null = null;
 
-	private queue: CommandTwitter[] = [];
-	private shouldProcess = false;
-
 	private serviceType = ServiceType.TWITTER;
 
 	private constructor() {}
@@ -42,40 +39,7 @@ export class Twitter {
 		return this.instance;
 	}
 
-	public async initialize() {
-		this.shouldProcess = true;
-	}
-
-	public pushCommand(command: CommandTwitter) {
-		this.queue.push(command);
-	}
-
-	public async start() {
-		do {
-			await sleep(1000);
-
-			if(this.queue.length === 0) {
-				continue;
-			}
-
-			const command = this.queue.shift()!;
-
-			try {
-				await this.process(command);
-			}
-			catch(error) {
-				console.log(error);
-				this.queue.unshift(command);
-			}
-		}
-		while(this.shouldProcess);
-	}
-
-	public async stop() {
-		this.shouldProcess = false;
-	}
-
-	private async process(command: CommandTwitter): Promise<true> {
+	public async process(command: CommandTwitter): Promise<true> {
 		log('twitter', 'process', command.type);
 
 		switch(command.type) {
@@ -95,7 +59,7 @@ export class Twitter {
 				};
 				for(const id of ids) {
 					const database = Database.getInstance();
-					database.pushCommand({
+					await database.process({
 						'type': CommandType.DATABASE_INSERT_ACCOUNT,
 						'payload': {
 							'id': id,
@@ -116,7 +80,7 @@ export class Twitter {
 					}
 
 					const database = Database.getInstance();
-					database.pushCommand({
+					await database.process({
 						'type': CommandType.DATABASE_INSERT_TWEET,
 						'payload': {
 							'tweet': tweet,
@@ -153,7 +117,7 @@ export class Twitter {
 						}
 
 						if(id !== null && url !== null) {
-							database.pushCommand({
+							await database.process({
 								'type': CommandType.DATABASE_INSERT_MEDIUM,
 								'payload': {
 									'url': url,

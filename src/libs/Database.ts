@@ -1,9 +1,6 @@
 import knex from 'knex';
 import { TableName } from '~/constants';
-import {
-	log,
-	sleep,
-} from '~/helpers';
+import { log } from '~/helpers';
 import {
 	CommandType,
 	CommandDatabase,
@@ -15,9 +12,6 @@ import env from '../../env.json';
 
 export class Database {
 	private static instance: Database | null = null;
-
-	private queue: CommandDatabase[] = [];
-	private shouldProcess: boolean = false;
 
 	private knex: knex;
 
@@ -73,12 +67,6 @@ export class Database {
 		await this.createTable(TableName.TWITTER_ACCOUNTS);
 		await this.createTable(TableName.TWITTER_TWEETS);
 		await this.createTable(TableName.TWITTER_MEDIA);
-
-		this.shouldProcess = true;
-	}
-
-	public pushCommand(command: CommandDatabase) {
-		this.queue.push(command);
 	}
 
 	private async hasAccount(id: string): Promise<boolean> {
@@ -210,26 +198,7 @@ export class Database {
 		});
 	}
 
-	public async start() {
-		do {
-			await sleep(10);
-
-			if (this.queue.length === 0) {
-				continue;
-			}
-
-			const command = this.queue.shift()!;
-
-			await this.process(command);
-		}
-		while (this.shouldProcess);
-	}
-
-	public async stop() {
-		this.shouldProcess = false;
-	}
-
-	private async process(command: CommandDatabase): Promise<true> {
+	public async process(command: CommandDatabase): Promise<true> {
 		log('database', 'process', command.type);
 
 		switch (command.type) {

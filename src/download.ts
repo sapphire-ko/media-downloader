@@ -24,6 +24,8 @@ function parseURL(value: string) {
 	return url.parse(value);
 }
 
+// let c = 0;
+
 async function process(params: {
 	index: number;
 	downloadPath: string;
@@ -46,6 +48,7 @@ async function process(params: {
 	const rows: Media[] = await knex(TableName.TWITTER_MEDIA)
 		.where({
 			downloaded: false,
+			retry_count: 0,
 		});
 
 	if (rows.length > 0) {
@@ -55,6 +58,11 @@ async function process(params: {
 	let totalCount = 0;
 	let successCount = 0;
 	let failureCount = 0;
+	const totalLength = rows.length;
+
+	const LIMIT = 100;
+
+	rows.splice(LIMIT);
 
 	for (const row of rows) {
 		const {
@@ -66,9 +74,15 @@ async function process(params: {
 		if (downloaded === true) {
 			continue;
 		}
-		if (retry_count > 10) {
+		if (retry_count > 1) {
 			continue;
 		}
+		if (rows.length > LIMIT) {
+			break;
+		}
+		// if (row.url.startsWith('https://video.')) {
+		// 	continue;
+		// }
 
 		await sleep(10);
 
