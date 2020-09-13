@@ -1,6 +1,4 @@
-import fetch, {
-	Response,
-} from 'node-fetch';
+import fetch from 'node-fetch';
 import qs from 'qs';
 import { API_URL_TWITTER } from '~/constants';
 import { Authentication } from '~/libs';
@@ -188,30 +186,32 @@ export async function sendRequest(payload: RequestPayload): Promise<any> {
 	log(payload);
 
 	try {
-		let response: Response | null = null;
-
-		switch (methodType) {
-			case RequestMethodType.GET: {
-				response = await fetch(url, {
-					'method': 'get',
-					'headers': headers,
-				});
-				break;
+		const getResponse = async () => {
+			log(url, methodType);
+			switch (methodType) {
+				case RequestMethodType.GET: {
+					return await fetch(url, {
+						'method': 'get',
+						'headers': headers,
+					});
+				}
+				case RequestMethodType.POST: {
+					return await fetch(url, {
+						'method': 'post',
+						'headers': headers,
+					});
+				}
 			}
-			case RequestMethodType.POST: {
-				response = await fetch(url, {
-					'method': 'post',
-					'headers': headers,
-				});
-				break;
-			}
-		}
+		};
+		const response = await getResponse();
+		log('response');
 
 		if (response === null) {
 			throw new Error('failed to send request');
 		}
 
 		const data = await response.json();
+		log('data');
 
 		if (response.status !== 200) {
 			throw new Error(response.statusText);
