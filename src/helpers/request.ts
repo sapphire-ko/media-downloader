@@ -1,3 +1,5 @@
+import fs from 'fs';
+import path from 'path';
 import fetch from 'node-fetch';
 import qs from 'qs';
 import { API_URL_TWITTER } from '~/constants';
@@ -211,7 +213,9 @@ export async function sendRequest(payload: RequestPayload): Promise<any> {
 		}
 
 		const text = await response.text();
-		log('text', text);
+
+		const filePath = path.resolve(__dirname, '..', '..', 'resp.txt');
+		await fs.promises.writeFile(filePath, text);
 
 		const data = JSON.parse(text);
 
