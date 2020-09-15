@@ -210,8 +210,13 @@ export async function sendRequest(payload: RequestPayload): Promise<any> {
 			throw new Error('failed to send request');
 		}
 
-		const data = await response.json();
-		log('data');
+		const text = await response.text();
+		log('text', text);
+
+		const data = JSON.parse(text);
+
+		// const data = await response.json();
+		// log('data');
 
 		if (response.status !== 200) {
 			throw new Error(response.statusText);
