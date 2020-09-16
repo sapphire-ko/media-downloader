@@ -1,8 +1,6 @@
+import schedule from 'node-schedule';
 import { dataPath } from './constants';
-import {
-	mkdir,
-	sleep,
-} from './helpers';
+import { mkdir } from './helpers';
 import {
 	Authentication,
 	Database,
@@ -43,24 +41,21 @@ export class App {
 		const downloader = Downloader.getInstance();
 
 		await twitter.process({
-			'type': CommandType.TWITTER_FOLLOWING_IDS,
+			type: CommandType.TWITTER_FOLLOWING_IDS,
 		});
 		await twitter.process({
-			'type': CommandType.TWITTER_RATE_LIMIT_STATUS,
+			type: CommandType.TWITTER_RATE_LIMIT_STATUS,
 		});
 
-		do {
+		schedule.scheduleJob('0,30 * * * * *', async () => {
 			await twitter.process({
-				'type': CommandType.TWITTER_HOME_TIMELINE,
-				'payload': {
-					'since_id': '',
+				type: CommandType.TWITTER_HOME_TIMELINE,
+				payload: {
+					since_id: '',
 				},
 			});
 
 			await downloader.downloadMedia();
-
-			await sleep(30000);
-		}
-		while (true);
+		});
 	}
 }
