@@ -1,5 +1,3 @@
-import fs from 'fs';
-import path from 'path';
 import fetch from 'node-fetch';
 import qs from 'qs';
 import { API_URL_TWITTER } from '~/constants';
@@ -189,7 +187,6 @@ export async function sendRequest(payload: RequestPayload): Promise<any> {
 
 	try {
 		const getResponse = async () => {
-			log(url, methodType);
 			switch (methodType) {
 				case RequestMethodType.GET: {
 					return await fetch(url, {
@@ -206,27 +203,16 @@ export async function sendRequest(payload: RequestPayload): Promise<any> {
 			}
 		};
 		const response = await getResponse();
-		log('response');
 
 		if (response === null) {
 			throw new Error('failed to send request');
 		}
 
-		const text = await response.text();
-
-		const filePath = path.resolve(__dirname, '..', '..', 'resp.txt');
-		await fs.promises.writeFile(filePath, text);
-
-		const data = JSON.parse(text);
-
-		// const data = await response.json();
-		// log('data');
-
 		if (response.status !== 200) {
 			throw new Error(response.statusText);
 		}
 
-		return data;
+		return await response.json();
 	}
 	catch (error) {
 		console.log(error);

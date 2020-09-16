@@ -9,6 +9,7 @@ import {
 } from '~/constants';
 import {
 	download,
+	log,
 	mkdir,
 	sleep,
 } from '~/helpers';
@@ -52,7 +53,7 @@ async function process(params: {
 		});
 
 	if (rows.length > 0) {
-		console.log(`[${index}]`, rows.length, accountId);
+		log(`[${index}]`, rows.length, accountId);
 	}
 
 	let totalCount = 0;
@@ -110,7 +111,7 @@ async function process(params: {
 			++successCount;
 		}
 		catch (error) {
-			console.log(`[${index}]`, error.message, accountId, row.tweet_id, row.url);
+			log(`[${index}]`, error.message, accountId, row.tweet_id, row.url);
 
 			await knex(TableName.TWITTER_MEDIA)
 				.where({ url })
@@ -123,7 +124,7 @@ async function process(params: {
 	}
 
 	if (rows.length > 0) {
-		console.log(`[${index}]`, successCount, failureCount, totalCount, rows.length, accountId);
+		log(`[${index}]`, successCount, failureCount, totalCount, rows.length, accountId);
 	}
 
 	await knex.destroy();
@@ -177,11 +178,11 @@ async function process(params: {
 			}
 			while (filenames.length > 0);
 
-			console.log(`[${i}]`, `done`);
+			log(`[${i}]`, `done`);
 		});
 		await Promise.all(promises);
 
-		console.log(`count`, count);
+		log(`count`, count);
 	}
 	catch (error) {
 		console.trace(error);

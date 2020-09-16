@@ -1,5 +1,6 @@
 import { dataPath } from '~/constants';
 import {
+	log,
 	readFile,
 	writeFile,
 } from '~/helpers';
@@ -47,7 +48,7 @@ export class Authentication {
 			await this.import();
 		}
 		catch(error) {
-			console.log(`${this.filename} does not exist`);
+			log(`${this.filename} does not exist`);
 		}
 
 		let shouldExport = false;

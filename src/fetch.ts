@@ -16,6 +16,7 @@ import {
 	Twitter,
 } from './libs';
 import {
+	log,
 	sleep,
 	sendRequest,
 } from './helpers';
@@ -137,7 +138,7 @@ async function fetch(id: string) {
 				tweets.push(module.status.data);
 			}
 
-			console.log(`tweets.length`, tweets.length);
+			log(`tweets.length`, tweets.length);
 
 			for (const tweet of tweets) {
 				await sleep(5);
@@ -298,7 +299,7 @@ function ids6(data: { ids: string[] }) {
 
 (async () => {
 	try {
-		console.log(new Date());
+		log();
 
 		Twitter.createInstance();
 
@@ -309,8 +310,8 @@ function ids6(data: { ids: string[] }) {
 		const status = await sendRequest({
 			'type': RequestType.TWITTER_RATE_LIMIT_STATUS,
 		}) as RateLimitStatus;
-		console.log(status.resources.friends['/friends/list']);
-		console.log(status.resources.search['/search/universal']);
+		log(status.resources.friends['/friends/list']);
+		log(status.resources.search['/search/universal']);
 
 		// let users: AccountTwitter[] = [];
 		// let cursor = '';
@@ -330,7 +331,7 @@ function ids6(data: { ids: string[] }) {
 		// 	users = users.concat(data.users);
 		// 	cursor = data.next_cursor_str;
 		// 	await sleep(100);
-		// 	console.log('user count', users.length);
+		// 	log('user count', users.length);
 		// }
 		// while (cursor !== '0');
 
@@ -340,7 +341,7 @@ function ids6(data: { ids: string[] }) {
 			ids: string[];
 		};
 
-		console.log('data.ids.length', data.ids.length);
+		log('data.ids.length', data.ids.length);
 
 		const getIds = () => {
 			// const ids = ids1(users);
@@ -363,7 +364,7 @@ function ids6(data: { ids: string[] }) {
 		};
 		const ids = getIds();
 
-		console.log(`ids.length`, ids.length);
+		log(`ids.length`, ids.length);
 
 		{
 			const knex = Knex({
@@ -407,7 +408,7 @@ function ids6(data: { ids: string[] }) {
 
 		await Promise.all(promises);
 
-		console.log(`done`);
+		log(`done`);
 	}
 	catch (error) {
 		console.log(error);
