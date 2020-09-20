@@ -2,6 +2,7 @@
 
 set -ex
 
+pm2 list
 npm stop
 mv data data_1;
 mkdir data;
