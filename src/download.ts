@@ -61,7 +61,7 @@ async function process(params: {
 	let failureCount = 0;
 	const totalLength = rows.length;
 
-	const LIMIT = 100;
+	const LIMIT = 200;
 
 	rows.splice(LIMIT);
 
@@ -170,11 +170,12 @@ async function process(params: {
 				await sleep(10);
 
 				const id = filename.split('.').shift()!;
-				count += await process({
+				const x = await process({
 					index: i,
 					downloadPath: aPath,
 					accountId: id,
 				});
+				count += x;
 			}
 			while (filenames.length > 0);
 
