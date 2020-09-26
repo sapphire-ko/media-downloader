@@ -368,11 +368,11 @@ function ids6(data: { ids: string[] }) {
 
 		{
 			const knex = Knex({
-				'client': 'sqlite3',
-				'connection': {
-					'filename': path.resolve(dataPath, `ids.sqlite`),
+				client: 'sqlite3',
+				connection: {
+					filename: path.resolve(dataPath, `ids.sqlite`),
 				},
-				'useNullAsDefault': true,
+				useNullAsDefault: true,
 			});
 
 			const exists = await knex.schema.hasTable(TableName.TWITTER_IDS);
@@ -384,7 +384,7 @@ function ids6(data: { ids: string[] }) {
 			}
 
 			await knex(TableName.TWITTER_IDS).insert({
-				ids: ids.join(' '),
+				ids: data.ids.join(' '),
 			});
 
 			await knex.destroy();

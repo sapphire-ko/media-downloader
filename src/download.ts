@@ -25,8 +25,6 @@ function parseURL(value: string) {
 	return url.parse(value);
 }
 
-// let c = 0;
-
 async function process(params: {
 	index: number;
 	downloadPath: string;
@@ -46,11 +44,11 @@ async function process(params: {
 		useNullAsDefault: true,
 	});
 
+	const RETRY_COUNT = 2;
+
 	const rows: Media[] = await knex(TableName.TWITTER_MEDIA)
-		.where({
-			downloaded: false,
-			retry_count: 0,
-		});
+		.where('downloaded', false)
+		.andWhere('retry_count', '<=', RETRY_COUNT);
 
 	if (rows.length > 0) {
 		log(`[${index}]`, rows.length, accountId);
@@ -59,9 +57,8 @@ async function process(params: {
 	let totalCount = 0;
 	let successCount = 0;
 	let failureCount = 0;
-	const totalLength = rows.length;
 
-	const LIMIT = 200;
+	const LIMIT = Infinity;
 
 	rows.splice(LIMIT);
 
@@ -75,17 +72,14 @@ async function process(params: {
 		if (downloaded === true) {
 			continue;
 		}
-		if (retry_count > 1) {
+		if (retry_count > RETRY_COUNT) {
 			continue;
 		}
 		if (rows.length > LIMIT) {
 			break;
 		}
-		// if (row.url.startsWith('https://video.')) {
-		// 	continue;
-		// }
 
-		await sleep(10);
+		await sleep(Math.ceil(100 * (1 + Math.random())));
 
 		try {
 			const getFilePath = async (url: string) => {
