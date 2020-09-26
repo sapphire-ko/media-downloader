@@ -20,6 +20,7 @@ import {
 	sleep,
 	sendRequest,
 } from './helpers';
+import { compress } from './helpers/zlib';
 
 interface Medium {
 	tweet_id: string;
@@ -53,8 +54,8 @@ async function fetch(id: string) {
 		const exists = await knex.schema.hasTable(TableName.TWITTER_TWEETS);
 		if (exists === false) {
 			await knex.schema.createTable(TableName.TWITTER_TWEETS, table => {
-				table.string('id').primary().unique().notNullable();
-				table.text('data').notNullable();
+				table.string('id').primary().notNullable();
+				table.binary('data').notNullable();
 				table.timestamps(true, true);
 			});
 		}
@@ -156,7 +157,7 @@ async function fetch(id: string) {
 				else {
 					await knex(TableName.TWITTER_TWEETS).insert({
 						'id': tweet.id_str,
-						'data': JSON.stringify(tweet),
+						'data': await compress(tweet),
 					});
 				}
 
