@@ -31,11 +31,11 @@ interface Medium {
 
 async function fetch(id: string) {
 	const knex = Knex({
-		'client': 'sqlite3',
-		'connection': {
-			'filename': path.resolve(dataPath, `${id}.sqlite`),
+		client: 'sqlite3',
+		connection: {
+			filename: path.resolve(dataPath, `${id}.sqlite`),
 		},
-		'useNullAsDefault': true,
+		useNullAsDefault: true,
 	});
 
 	{
@@ -77,17 +77,17 @@ async function fetch(id: string) {
 		if (rows.length === 0) {
 			try {
 				const data = await sendRequest({
-					'type': RequestType.TWITTER_USER,
-					'params': {
-						'user_id': id,
+					type: RequestType.TWITTER_USER,
+					params: {
+						user_id: id,
 					},
 				}) as AccountTwitter;
 
 				await knex(TableName.TWITTER_ACCOUNTS).insert({
-					'id': id,
-					'screen_name': data.screen_name,
-					'data': JSON.stringify(data),
-					'is_fetched': false,
+					id,
+					screen_name: data.screen_name,
+					data: JSON.stringify(data),
+					is_fetched: false,
 				});
 			}
 			catch (error) {
@@ -124,10 +124,10 @@ async function fetch(id: string) {
 			await sleep(100);
 
 			const data = await sendRequest({
-				'type': RequestType.TWITTER_SEARCH_UNIVERSAL,
-				'params': {
-					'screen_name': screenName,
-					'max_id': maxId,
+				type: RequestType.TWITTER_SEARCH_UNIVERSAL,
+				params: {
+					screen_name: screenName,
+					max_id: maxId,
 				},
 			}) as { modules: { status: { data: Tweet; }; }[]; };
 
@@ -145,7 +145,7 @@ async function fetch(id: string) {
 				await sleep(5);
 
 				const rows = await knex(TableName.TWITTER_TWEETS).where({
-					'id': tweet.id_str,
+					id: tweet.id_str,
 				});
 
 				if (rows.length > 0) {
@@ -156,8 +156,8 @@ async function fetch(id: string) {
 				}
 				else {
 					await knex(TableName.TWITTER_TWEETS).insert({
-						'id': tweet.id_str,
-						'data': await compress(tweet),
+						id: tweet.id_str,
+						data: await compress(tweet),
 					});
 				}
 
@@ -197,16 +197,16 @@ async function fetch(id: string) {
 					}
 
 					return {
-						'tweet_id': tweet.id_str,
-						'url': url,
-						'downloaded': false,
-						'retry_count': 0,
+						tweet_id: tweet.id_str,
+						url,
+						downloaded: false,
+						retry_count: 0,
 					};
 				}).filter((x): x is Medium => x !== null);
 
 				for (const medium of media) {
 					const rows = await knex(TableName.TWITTER_MEDIA).where({
-						'url': medium.url,
+						url: medium.url,
 					});
 
 					if (rows.length > 0) {
@@ -225,9 +225,9 @@ async function fetch(id: string) {
 			else {
 				if (isFetched === false) {
 					await knex(TableName.TWITTER_ACCOUNTS).where({
-						'id': id,
+						id,
 					}).update({
-						'is_fetched': true,
+						is_fetched: true,
 					});
 				}
 				break;
