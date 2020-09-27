@@ -1,0 +1,236 @@
+{
+  "created_at": "Sun Sep 27 00:22:30 +0000 2020",
+  "id": 1310011899530993700,
+  "id_str": "1310011899530993664",
+  "full_text": "There are lots of ways to #ObserveTheMoon tonight! \n\n🔭 Look up\n🎨 Make some Moon-inspired artwork\n🌘 Join our live broadcast, happening now\n\nGot questions for our experts? Use the hashtag #AskNASA: https://t.co/QxcrqdDEto https://t.co/u7pB9TxRma",
+  "truncated": false,
+  "display_text_range": [
+   0,
+   219
+  ],
+  "entities": {
+   "hashtags": [
+    {
+     "text": "ObserveTheMoon",
+     "indices": [
+      26,
+      41
+     ]
+    },
+    {
+     "text": "AskNASA",
+     "indices": [
+      186,
+      194
+     ]
+    }
+   ],
+   "symbols": [],
+   "user_mentions": [],
+   "urls": [
+    {
+     "url": "https://t.co/QxcrqdDEto",
+     "expanded_url": "https://twitter.com/i/broadcasts/1gqxvagrpdRJB",
+     "display_url": "twitter.com/i/broadcasts/1…",
+     "indices": [
+      196,
+      219
+     ]
+    }
+   ],
+   "media": [
+    {
+     "id": 1310010110912028700,
+     "id_str": "1310010110912028672",
+     "indices": [
+      220,
+      243
+     ],
+     "media_url": "http://pbs.twimg.com/amplify_video_thumb/1310010110912028672/img/lQlzUsXnIPpER3vc.jpg",
+     "media_url_https": "https://pbs.twimg.com/amplify_video_thumb/1310010110912028672/img/lQlzUsXnIPpER3vc.jpg",
+     "url": "https://t.co/u7pB9TxRma",
+     "display_url": "pic.twitter.com/u7pB9TxRma",
+     "expanded_url": "https://twitter.com/NASA/status/1310011899530993664/video/1",
+     "type": "photo",
+     "sizes": {
+      "thumb": {
+       "w": 150,
+       "h": 150,
+       "resize": "crop"
+      },
+      "medium": {
+       "w": 1200,
+       "h": 675,
+       "resize": "fit"
+      },
+      "small": {
+       "w": 680,
+       "h": 383,
+       "resize": "fit"
+      },
+      "large": {
+       "w": 1280,
+       "h": 720,
+       "resize": "fit"
+      }
+     }
+    }
+   ]
+  },
+  "extended_entities": {
+   "media": [
+    {
+     "id": 1310010110912028700,
+     "id_str": "1310010110912028672",
+     "indices": [
+      220,
+      243
+     ],
+     "media_url": "http://pbs.twimg.com/amplify_video_thumb/1310010110912028672/img/lQlzUsXnIPpER3vc.jpg",
+     "media_url_https": "https://pbs.twimg.com/amplify_video_thumb/1310010110912028672/img/lQlzUsXnIPpER3vc.jpg",
+     "url": "https://t.co/u7pB9TxRma",
+     "display_url": "pic.twitter.com/u7pB9TxRma",
+     "expanded_url": "https://twitter.com/NASA/status/1310011899530993664/video/1",
+     "type": "video",
+     "sizes": {
+      "thumb": {
+       "w": 150,
+       "h": 150,
+       "resize": "crop"
+      },
+      "medium": {
+       "w": 1200,
+       "h": 675,
+       "resize": "fit"
+      },
+      "small": {
+       "w": 680,
+       "h": 383,
+       "resize": "fit"
+      },
+      "large": {
+       "w": 1280,
+       "h": 720,
+       "resize": "fit"
+      }
+     },
+     "video_info": {
+      "aspect_ratio": [
+       16,
+       9
+      ],
+      "duration_millis": 71002,
+      "variants": [
+       {
+        "bitrate": 2176000,
+        "content_type": "video/mp4",
+        "url": "https://video.twimg.com/amplify_video/1310010110912028672/vid/1280x720/LMHbOQ0VyVQ8oPxZ.mp4?tag=13"
+       },
+       {
+        "content_type": "application/x-mpegURL",
+        "url": "https://video.twimg.com/amplify_video/1310010110912028672/pl/n9shhjp09jHEjC8N.m3u8?tag=13"
+       },
+       {
+        "bitrate": 832000,
+        "content_type": "video/mp4",
+        "url": "https://video.twimg.com/amplify_video/1310010110912028672/vid/640x360/Vq3jI_oj5aZKzfmr.mp4?tag=13"
+       },
+       {
+        "bitrate": 288000,
+        "content_type": "video/mp4",
+        "url": "https://video.twimg.com/amplify_video/1310010110912028672/vid/480x270/pNd1z88yrMbHXtQo.mp4?tag=13"
+       }
+      ]
+     },
+     "ext_alt_text": null,
+     "additional_media_info": {
+      "title": "#ObserveTheMoon",
+      "description": "There are lots of ways to #ObserveTheMoon tonight! \n\n🔭 Look up\n🎨 Make some Moon-inspired artwork\n🌘 Join our live broadcast, happening now\n\nGot questions for our experts? Use the hashtag #AskNASA: ",
+      "embeddable": true,
+      "monetizable": false
+     }
+    }
+   ]
+  },
+  "source": "<a href=\"https://www.twitter.com/\" rel=\"nofollow\">Twitter Media Studio - LiveCut</a>",
+  "in_reply_to_status_id": null,
+  "in_reply_to_status_id_str": null,
+  "in_reply_to_user_id": null,
+  "in_reply_to_user_id_str": null,
+  "in_reply_to_screen_name": null,
+  "user": {
+   "id": 11348282,
+   "id_str": "11348282",
+   "name": "NASA",
+   "screen_name": "NASA",
+   "location": "",
+   "description": "Explore the universe and our home planet with NASA 🌎 We usually post in EDT.",
+   "url": "https://t.co/HMJJbimQpV",
+   "entities": {
+    "url": {
+     "urls": [
+      {
+       "url": "https://t.co/HMJJbimQpV",
+       "expanded_url": "http://www.nasa.gov/",
+       "display_url": "nasa.gov",
+       "indices": [
+        0,
+        23
+       ]
+      }
+     ]
+    },
+    "description": {
+     "urls": []
+    }
+   },
+   "protected": false,
+   "followers_count": 40791394,
+   "friends_count": 222,
+   "listed_count": 92912,
+   "created_at": "Wed Dec 19 20:20:32 +0000 2007",
+   "favourites_count": 11899,
+   "utc_offset": null,
+   "time_zone": null,
+   "geo_enabled": false,
+   "verified": true,
+   "statuses_count": 62294,
+   "lang": null,
+   "contributors_enabled": false,
+   "is_translator": false,
+   "is_translation_enabled": false,
+   "profile_background_color": "000000",
+   "profile_background_image_url": "http://abs.twimg.com/images/themes/theme1/bg.png",
+   "profile_background_image_url_https": "https://abs.twimg.com/images/themes/theme1/bg.png",
+   "profile_background_tile": false,
+   "profile_image_url": "http://pbs.twimg.com/profile_images/1091070803184177153/TI2qItoi_normal.jpg",
+   "profile_image_url_https": "https://pbs.twimg.com/profile_images/1091070803184177153/TI2qItoi_normal.jpg",
+   "profile_banner_url": "https://pbs.twimg.com/profile_banners/11348282/1597420588",
+   "profile_image_extensions_alt_text": null,
+   "profile_banner_extensions_alt_text": null,
+   "profile_link_color": "205BA7",
+   "profile_sidebar_border_color": "000000",
+   "profile_sidebar_fill_color": "F3F2F2",
+   "profile_text_color": "000000",
+   "profile_use_background_image": true,
+   "has_extended_profile": true,
+   "default_profile": false,
+   "default_profile_image": false,
+   "following": true,
+   "follow_request_sent": false,
+   "notifications": false,
+   "translator_type": "regular"
+  },
+  "geo": null,
+  "coordinates": null,
+  "place": null,
+  "contributors": null,
+  "is_quote_status": false,
+  "retweet_count": 26,
+  "favorite_count": 99,
+  "favorited": false,
+  "retweeted": false,
+  "possibly_sensitive": false,
+  "possibly_sensitive_appealable": false,
+  "lang": "en"
+ }
