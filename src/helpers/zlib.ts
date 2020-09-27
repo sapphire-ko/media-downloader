@@ -1,6 +1,6 @@
 import zlib from 'zlib';
 
-export function compress<T>(data: T): Promise<string> {
+export function compress<T>(data: T): Promise<Buffer> {
 	const jsonStr = JSON.stringify(data);
 	const buffer = Buffer.from(jsonStr);
 
@@ -10,15 +10,15 @@ export function compress<T>(data: T): Promise<string> {
 				reject(err);
 			}
 			else {
-				resolve(result.toString('base64'));
+				resolve(result);
 			}
 		});
 	});
 }
 
-export function decompress<T>(data: string): Promise<T> {
+export function decompress<T>(data: Buffer): Promise<T> {
 	return new Promise((resolve, reject) => {
-		zlib.inflate(Buffer.from(data, 'base64'), (err, result) => {
+		zlib.inflate(data, (err, result) => {
 			if (err) {
 				reject(err);
 			}

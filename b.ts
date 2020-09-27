@@ -55,8 +55,8 @@ const main = async () => {
 		let count = 0;
 		for (const row of rows) {
 			++count;
-			if (count % 100 === 0) {
-				console.log('count', count);
+			if (count % 1000 === 0) {
+				console.log('count', `${count}`.padStart(`${rows.length}`.length, '0'), rows.length);
 			}
 			await knex(`twitter_tweets`).insert({
 				id: row.id,
