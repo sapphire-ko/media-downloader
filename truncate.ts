@@ -3,7 +3,7 @@ import tweet from './tweet.json';
 
 const main = async () => {
 	const x = await compress(tweet);
-	x.
+	// x.
 };
 
 (async () => {
