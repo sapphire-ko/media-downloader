@@ -3,7 +3,7 @@ import https from 'https';
 
 export const download = async (url: string, filePath: string) => {
 	await new Promise((resolve, reject) => {
-		https.get(url, response => {
+		https.get(url, { rejectUnauthorized: false }, response => {
 			if (response.statusCode !== 200) {
 				return reject(new Error(`${response.statusCode}`));
 			}
