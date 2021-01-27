@@ -344,26 +344,30 @@ function ids6(data: { ids: string[] }) {
 
 		log('data.ids.length', data.ids.length);
 
-		const getIds = () => {
+		const getIds = (key: string) => {
 			// const ids = ids1(users);
 			// const ids = ids2(users);
 
 			// const ids = ids3(data);
 			// const ids = ids4(data);
 
-			switch (process.argv[2]) {
-				case 'a': {
-					return ids5(data);
-				}
-				case 'b': {
-					return ids6(data);
-				}
-				default: {
-					return [];
-				}
+			const keys = [
+				'a',
+				'b',
+				'c',
+			];
+
+			const index = keys.indexOf(key);
+			if (index === -1) {
+				return [];
 			}
+			return data.ids.filter(id => {
+				const subId = id.substr(-3);
+				const x = parseInt(subId, 10) % keys.length;
+				return x === index;
+			});
 		};
-		const ids = getIds();
+		const ids = getIds(process.argv[2]);
 
 		log(`ids.length`, ids.length);
 

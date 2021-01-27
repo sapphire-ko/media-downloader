@@ -12,3 +12,5 @@ function fetch {
 fetch a
 sleep $((10 * 60))
 fetch b
+sleep $((10 * 60))
+fetch c
