@@ -1,4 +1,7 @@
+import { stringifyDate } from './stringifyDate';
+
 export const log = (...message: any[]) => {
 	const date = new Date();
-	console.log(date, ...message);
+	const dateText = stringifyDate(date);
+	console.log(dateText, ...message);
 };
