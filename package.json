@@ -11,7 +11,7 @@
     "start": "pm2 start ./app.json",
     "stop": "pm2 stop ./app.json",
     "lint": "tslint -p ./tsconfig.json",
-    "ts-node": "ts-node  -r tsconfig-paths/register",
+    "ts-node": "ts-node -r tsconfig-paths/register",
     "start:dev": "npm run ts-node ./src/index.ts",
     "fetch": "npm run ts-node ./src/fetch.ts",
     "download": "npm run ts-node ./src/download.ts"

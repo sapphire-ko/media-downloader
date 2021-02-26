@@ -46,13 +46,21 @@ async function process(params: {
 
 	const RETRY_COUNT = 2;
 
-	const rows: Media[] = await knex(TableName.TWITTER_MEDIA)
-		.where('downloaded', false)
-		.andWhere('retry_count', '<=', RETRY_COUNT);
+	const getRows = async () => {
+		try {
+			const rows: Media[] = await knex(TableName.TWITTER_MEDIA)
+				.where('downloaded', false)
+				.andWhere('retry_count', '<=', RETRY_COUNT);
+			return rows;
+		}
+		catch (error) {
+			log(accountId, error);
+			return [];
+		}
+	};
+	const rows = await getRows();
 
-	if (rows.length > 0) {
-		log(`[${index}]`, rows.length, accountId);
-	}
+	log(`[${index}]`, rows.length, accountId);
 
 	let totalCount = 0;
 	let successCount = 0;
