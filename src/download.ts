@@ -54,13 +54,13 @@ async function process(params: {
 			return rows;
 		}
 		catch (error) {
-			log(accountId, error);
+			log('error', accountId, error);
 			return [];
 		}
 	};
 	const rows = await getRows();
 
-	log(`[${index}]`, rows.length, accountId);
+	log('info', `[${index}]`, rows.length, accountId);
 
 	let totalCount = 0;
 	let successCount = 0;
@@ -113,7 +113,7 @@ async function process(params: {
 			++successCount;
 		}
 		catch (error) {
-			log(`[${index}]`, error.message, accountId, row.tweet_id, row.url);
+			log('error', `[${index}]`, error.message, accountId, row.tweet_id, row.url);
 
 			await knex(TableName.TWITTER_MEDIA)
 				.where({ url })
@@ -126,7 +126,7 @@ async function process(params: {
 	}
 
 	if (rows.length > 0) {
-		log(`[${index}]`, successCount, failureCount, totalCount, rows.length, accountId);
+		log('info', `[${index}]`, successCount, failureCount, totalCount, rows.length, accountId);
 	}
 
 	await knex.destroy();
@@ -181,11 +181,11 @@ async function process(params: {
 			}
 			while (filenames.length > 0);
 
-			log(`[${i}]`, `done`);
+			log('info', `[${i}]`, `done`);
 		});
 		await Promise.all(promises);
 
-		log(`count`, count);
+		log('info', `count`, count);
 	}
 	catch (error) {
 		console.trace(error);

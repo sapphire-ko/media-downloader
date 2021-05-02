@@ -1,4 +1,5 @@
 import fs from 'fs';
+import { log } from './log';
 
 export async function mkdir(dirPath: string) {
 	try {
@@ -11,7 +12,7 @@ export async function mkdir(dirPath: string) {
 				break;
 			}
 			default: {
-				console.log(error);
+				log('error', error);
 				throw error;
 			}
 		}

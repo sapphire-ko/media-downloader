@@ -48,7 +48,7 @@ export class Authentication {
 			await this.import();
 		}
 		catch(error) {
-			log(`${this.filename} does not exist`);
+			log('error', `${this.filename} does not exist`);
 		}
 
 		let shouldExport = false;

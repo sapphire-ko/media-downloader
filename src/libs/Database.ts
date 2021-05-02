@@ -108,7 +108,7 @@ export class Database {
 	}
 
 	private async insertTweet(params: CommandDatabaseInsertTweet['payload']) {
-		log('database', 'insertTweet');
+		log('info', 'database', 'insertTweet');
 
 		const {
 			tweet,
@@ -134,7 +134,7 @@ export class Database {
 	}
 
 	private async insertMedium(params: CommandDatabaseInsertMedium['payload']) {
-		log('database', 'insertMedium');
+		log('info', 'database', 'insertMedium');
 
 		const {
 			url,
@@ -163,7 +163,7 @@ export class Database {
 		downloaded: boolean;
 		retry_count: number;
 	}[]> {
-		log('database', 'getMedia');
+		log('info', 'database', 'getMedia');
 
 		const rows = await this.knex(TableName.TWITTER_MEDIA).where({
 			'downloaded': false,
@@ -180,7 +180,7 @@ export class Database {
 		downloaded: boolean;
 		retryCount: number;
 	}) {
-		log('database', 'updateMedium');
+		log('info', 'database', 'updateMedium');
 
 		const {
 			account_id,
@@ -199,7 +199,7 @@ export class Database {
 	}
 
 	public async process(command: CommandDatabase): Promise<true> {
-		log('database', 'process', command.type);
+		log('info', 'database', 'process', command.type);
 
 		switch (command.type) {
 			case CommandType.DATABASE_INSERT_ACCOUNT: {

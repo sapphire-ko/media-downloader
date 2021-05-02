@@ -39,7 +39,7 @@ import {
 			previous_cursor_str: string;
 		};
 
-		log(list.users.length);
+		log('info', list.users.length);
 
 		users = users.concat(list.users);
 
@@ -50,7 +50,7 @@ import {
 		}
 	}
 	while(true);
-	log(JSON.stringify(users.map(user => {
+	log('info', JSON.stringify(users.map(user => {
 		return {
 			'id': user.id_str,
 			'screen_name': user.screen_name,

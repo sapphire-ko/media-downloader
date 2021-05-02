@@ -1,4 +1,7 @@
 {
   "name": "media-downloader",
-  "script": "./dist/main.js"
+  "script": "./dist/main.js",
+  "env": {
+    "NODE_ENV": "production"
+  }
 }

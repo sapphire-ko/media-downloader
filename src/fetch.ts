@@ -91,7 +91,7 @@ async function fetch(id: string) {
 				});
 			}
 			catch (error) {
-				console.log(error);
+				log('error', error);
 				await knex.destroy();
 				return;
 			}
@@ -139,7 +139,7 @@ async function fetch(id: string) {
 				tweets.push(module.status.data);
 			}
 
-			log(`tweets.length`, tweets.length);
+			log('info', `tweets.length`, tweets.length);
 
 			for (const tweet of tweets) {
 				await sleep(5);
@@ -236,7 +236,7 @@ async function fetch(id: string) {
 		while (shouldSkip === false);
 	}
 	catch (error) {
-		console.log(error);
+		log('error', error);
 	}
 
 	await knex.destroy();
@@ -300,8 +300,6 @@ function ids6(data: { ids: string[] }) {
 
 (async () => {
 	try {
-		log();
-
 		Twitter.createInstance();
 
 		Authentication.createInstance();
@@ -311,8 +309,8 @@ function ids6(data: { ids: string[] }) {
 		const status = await sendRequest({
 			'type': RequestType.TWITTER_RATE_LIMIT_STATUS,
 		}) as RateLimitStatus;
-		log(status.resources.friends['/friends/list']);
-		log(status.resources.search['/search/universal']);
+		log('info', status.resources.friends['/friends/list']);
+		log('info', status.resources.search['/search/universal']);
 
 		// let users: AccountTwitter[] = [];
 		// let cursor = '';
@@ -342,7 +340,7 @@ function ids6(data: { ids: string[] }) {
 			ids: string[];
 		};
 
-		log('data.ids.length', data.ids.length);
+		log('info', 'data.ids.length', data.ids.length);
 
 		const getIds = (key: string) => {
 			// const ids = ids1(users);
@@ -369,7 +367,7 @@ function ids6(data: { ids: string[] }) {
 		};
 		const ids = getIds(process.argv[2]);
 
-		log(`ids.length`, ids.length);
+		log('info', `ids.length`, ids.length);
 
 		{
 			const knex = Knex({
@@ -413,9 +411,9 @@ function ids6(data: { ids: string[] }) {
 
 		await Promise.all(promises);
 
-		log(`done`);
+		log('info', `done`);
 	}
 	catch (error) {
-		console.log(error);
+		log('error', error);
 	}
 })();

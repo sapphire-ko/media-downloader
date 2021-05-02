@@ -40,7 +40,7 @@ export class Twitter {
 	}
 
 	public async process(command: CommandTwitter): Promise<true> {
-		log('twitter', 'process', command.type);
+		log('info', 'twitter', 'process', command.type);
 
 		switch(command.type) {
 			case CommandType.TWITTER_RATE_LIMIT_STATUS: {
@@ -73,7 +73,7 @@ export class Twitter {
 					'type': RequestType.TWITTER_HOME_TIMELINE,
 					'params': command.payload,
 				}) as Tweet[];
-				log(`tweets`, tweets.length);
+				log('info', `tweets`, tweets.length);
 				for(const tweet of tweets) {
 					if(tweet.retweeted_status !== undefined) {
 						continue;

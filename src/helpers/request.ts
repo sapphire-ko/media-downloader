@@ -183,7 +183,7 @@ export async function sendRequest(payload: RequestPayload): Promise<any> {
 	const methodType = getRequestMethod(payload);
 	const url = getURL(payload);
 
-	log(payload);
+	log('info', payload);
 
 	try {
 		const getResponse = async () => {
@@ -215,6 +215,6 @@ export async function sendRequest(payload: RequestPayload): Promise<any> {
 		return await response.json();
 	}
 	catch (error) {
-		console.log(error);
+		log('error', error);
 	}
 }

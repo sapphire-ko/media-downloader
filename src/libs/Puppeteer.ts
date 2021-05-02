@@ -162,7 +162,7 @@ export class Puppeteer {
 		do {
 			await sleep(100);
 
-			log(`queue=${this.queue.length}`);
+			log('info', `queue=${this.queue.length}`);
 
 			if (this.queue.length === 0) {
 				continue;
@@ -170,7 +170,7 @@ export class Puppeteer {
 
 			const tweets = this.queue.shift()!;
 
-			log(tweets.length);
+			log('info', tweets.length);
 
 			await page.evaluate(_ => {
 				const list = document.querySelector('#open-modal .js-column-scroller');
@@ -233,7 +233,7 @@ export class Puppeteer {
 			await page.click(tweetsSelector);
 		}
 		catch (error) {
-			console.log(error);
+			log('error', error);
 		}
 	}
 

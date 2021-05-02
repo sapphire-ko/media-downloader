@@ -1,4 +1,5 @@
 import { App } from './App';
+import { log } from './helpers';
 
 (async () => {
 	try {
@@ -7,6 +8,6 @@ import { App } from './App';
 		await app.start();
 	}
 	catch (error) {
-		console.log(error);
+		log('error', error);
 	}
 })();
