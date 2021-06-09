@@ -1,5 +1,6 @@
 import fetch from 'node-fetch';
 import qs from 'qs';
+import AbortController from 'abort-controller';
 import { API_URL_TWITTER } from '~/constants';
 import { Authentication } from '~/libs';
 import {
@@ -186,33 +187,51 @@ export async function sendRequest(payload: RequestPayload): Promise<any> {
 	log('info', payload);
 
 	try {
-		const getResponse = async () => {
+		const getResponse = async (controller: AbortController) => {
 			switch (methodType) {
 				case RequestMethodType.GET: {
 					return await fetch(url, {
 						'method': 'get',
 						'headers': headers,
+						signal: controller.signal,
 					});
 				}
 				case RequestMethodType.POST: {
 					return await fetch(url, {
 						'method': 'post',
 						'headers': headers,
+						signal: controller.signal,
 					});
 				}
 			}
 		};
-		const response = await getResponse();
+		const controller = new AbortController();
+		const timeout = setTimeout(() => {
+			log('info', 'abort', url);
+			controller.abort();
+		}, 10000);
+		
+		try {
+			const response = await getResponse(controller);
 
-		if (response === null) {
-			throw new Error('failed to send request');
+			if (response === null) {
+				throw new Error('failed to send request');
+			}
+
+			if (response.status !== 200) {
+				throw new Error(response.statusText);
+			}
+
+			return await response.json();
+		}
+		catch (error) {
+			log(error);
+		}
+		finally {
+			clearTimeout(timeout);
 		}
 
-		if (response.status !== 200) {
-			throw new Error(response.statusText);
-		}
-
-		return await response.json();
+		throw new Error('invalid');
 	}
 	catch (error) {
 		log('error', error);
