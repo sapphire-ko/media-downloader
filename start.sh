@@ -14,3 +14,7 @@ sleep $((10 * 60))
 fetch b
 sleep $((10 * 60))
 fetch c
+
+sleep $((10 * 60))
+
+npm run download
