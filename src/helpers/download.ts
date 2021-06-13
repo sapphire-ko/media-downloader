@@ -1,9 +1,10 @@
 import fs from 'fs';
 import https from 'https';
+import { log } from './log';
 
 export const download = async (url: string, filePath: string) => {
 	await new Promise<void>((resolve, reject) => {
-		https.get(url, { rejectUnauthorized: false }, response => {
+		const request = https.get(url, { rejectUnauthorized: false }, response => {
 			if (response.statusCode !== 200) {
 				return reject(new Error(`${response.statusCode}`));
 			}
@@ -24,6 +25,15 @@ export const download = async (url: string, filePath: string) => {
 				clearTimeout(timeout);
 				resolve();
 			});
+
+			stream.on('error', error => {
+				log('error', 'request', error.name);
+				reject(error);
+			})
+		});
+		request.on('error', error => {
+			log('error', 'request', error.name);
+			reject(error);
 		});
 	});
 };
