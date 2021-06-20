@@ -14,7 +14,8 @@
     "ts-node": "ts-node -r tsconfig-paths/register",
     "start:dev": "npm run ts-node ./src/index.ts",
     "fetch": "npm run ts-node ./src/fetch.ts",
-    "download": "npm run ts-node ./src/download.ts"
+    "download": "npm run ts-node ./src/download.ts",
+    "artist": "npm run ts-node ./src/artist.ts"
   },
   "repository": {
     "type": "git",

@@ -1,15 +1,15 @@
 import fs from 'fs';
 import { log } from './log';
 
-export async function mkdir(dirPath: string) {
+export const exists = async (dirPath: string): Promise<boolean> => {
 	try {
 		await fs.promises.lstat(dirPath);
+		return true;
 	}
-	catch(error) {
-		switch(error.code) {
+	catch (error) {
+		switch (error.code) {
 			case 'ENOENT': {
-				await fs.promises.mkdir(dirPath);
-				break;
+				return false;
 			}
 			default: {
 				log('error', error);
@@ -17,6 +17,13 @@ export async function mkdir(dirPath: string) {
 			}
 		}
 	}
+}
+
+export async function mkdir(dirPath: string) {
+	if (await exists(dirPath)) {
+		return;
+	}
+	await fs.promises.mkdir(dirPath);
 }
 
 export async function readFile(filePath: string): Promise<string> {
