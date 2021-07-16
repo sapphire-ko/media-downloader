@@ -23,17 +23,17 @@ export class Twitter {
 
 	private serviceType = ServiceType.TWITTER;
 
-	private constructor() {}
+	private constructor() { }
 
 	public static createInstance() {
-		if(this.instance !== null) {
+		if (this.instance !== null) {
 			throw new Error('cannot create instance');
 		}
 		this.instance = new Twitter();
 	}
 
 	public static getInstance(): Twitter {
-		if(this.instance === null) {
+		if (this.instance === null) {
 			throw new Error('instance is null');
 		}
 		return this.instance;
@@ -42,7 +42,7 @@ export class Twitter {
 	public async process(command: CommandTwitter): Promise<true> {
 		log('info', 'twitter', 'process', command.type);
 
-		switch(command.type) {
+		switch (command.type) {
 			case CommandType.TWITTER_RATE_LIMIT_STATUS: {
 				const status = await this.sendRequest({
 					'type': RequestType.TWITTER_RATE_LIMIT_STATUS,
@@ -57,7 +57,7 @@ export class Twitter {
 				}) as {
 					ids: string[];
 				};
-				for(const id of ids) {
+				for (const id of ids) {
 					const database = Database.getInstance();
 					await database.process({
 						'type': CommandType.DATABASE_INSERT_ACCOUNT,
@@ -74,8 +74,8 @@ export class Twitter {
 					'params': command.payload,
 				}) as Tweet[];
 				log('info', `tweets`, tweets.length);
-				for(const tweet of tweets) {
-					if(tweet.retweeted_status !== undefined) {
+				for (const tweet of tweets) {
+					if (tweet.retweeted_status !== undefined) {
 						continue;
 					}
 
@@ -87,7 +87,7 @@ export class Twitter {
 						},
 					});
 
-					if(tweet.extended_entities === undefined) {
+					if (tweet.extended_entities === undefined) {
 						continue;
 					}
 
@@ -95,17 +95,18 @@ export class Twitter {
 						extended_entities: entities,
 					} = tweet;
 
-					for(const medium of entities.media) {
+					for (const medium of entities.media) {
 						let id: string | null = null;
 						let url: string | null = null;
 
-						switch(medium.type) {
+						switch (medium.type) {
 							case TwitterMediumType.PHOTO: {
 								id = medium.id_str;
 								url = `${medium.media_url_https}:orig`;
 								break;
 							}
-							case TwitterMediumType.VIDEO: {
+							case TwitterMediumType.VIDEO:
+							case TwitterMediumType.ANIMATED_GIF: {
 								id = medium.id_str;
 								url = medium.video_info.variants.filter(e => {
 									return e.content_type.startsWith('video');
@@ -116,7 +117,7 @@ export class Twitter {
 							}
 						}
 
-						if(id !== null && url !== null) {
+						if (id !== null && url !== null) {
 							await database.process({
 								'type': CommandType.DATABASE_INSERT_MEDIUM,
 								'payload': {
@@ -151,7 +152,7 @@ export class Twitter {
 
 			return true;
 		}
-		catch(error) {
+		catch (error) {
 			return false;
 		}
 	}
