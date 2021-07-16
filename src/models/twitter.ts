@@ -5,6 +5,7 @@ import {
 export enum TwitterMediumType {
 	PHOTO = 'photo',
 	VIDEO = 'video',
+	ANIMATED_GIF = 'animated_gif',
 }
 
 interface TwitterMediumPhoto {
@@ -22,9 +23,21 @@ interface TwitterMediumVideo {
 	};
 }
 
+interface TwitterMediumAnimatedGIF {
+	type: TwitterMediumType.ANIMATED_GIF;
+	video_info: {
+		variants: {
+			bitrate: number;
+			content_type: string;
+			url: string;
+		}[];
+	};
+}
+
 type TwitterMedium = (
 	| TwitterMediumPhoto
 	| TwitterMediumVideo
+	| TwitterMediumAnimatedGIF
 );
 
 export type AccountTwitter = Twitter.User;

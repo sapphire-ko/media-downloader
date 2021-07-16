@@ -15,7 +15,8 @@
     "start:dev": "npm run ts-node ./src/index.ts",
     "fetch": "npm run ts-node ./src/fetch.ts",
     "download": "npm run ts-node ./src/download.ts",
-    "artist": "npm run ts-node ./src/artist.ts"
+    "artist": "npm run ts-node ./src/artist.ts",
+    "gif": "npm run ts-node ./src/gif.ts"
   },
   "repository": {
     "type": "git",

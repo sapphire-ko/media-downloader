@@ -178,7 +178,8 @@ async function fetch(id: string) {
 							case TwitterMediumType.PHOTO: {
 								return `${medium.media_url_https}:orig`;
 							}
-							case TwitterMediumType.VIDEO: {
+							case TwitterMediumType.VIDEO:
+							case TwitterMediumType.ANIMATED_GIF: {
 								return medium.video_info.variants.filter(e => {
 									return e.content_type.startsWith('video');
 								}).sort((a, b) => {
