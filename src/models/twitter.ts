@@ -41,7 +41,7 @@ type TwitterMedium = (
 );
 
 export type AccountTwitter = Twitter.User;
-export type Tweet = Twitter.Status & {
+export type Tweet = Omit<Twitter.Status, 'extended_entities'> & {
 	extended_entities?: {
 		media: (Twitter.MediaEntity & TwitterMedium)[];
 	};
