@@ -162,6 +162,7 @@ function getURL(payload: RequestPayload): string {
 				'include_entities': '1',
 				'include_user_entities': '1',
 				'include_cards': '1',
+				'include_rts': '1',
 				'send_error_codes': '1',
 				'tweet_mode': 'extended',
 				'include_ext_alt_text': 'true',
@@ -210,7 +211,7 @@ export async function sendRequest(payload: RequestPayload): Promise<any> {
 			log('info', 'abort', url);
 			controller.abort();
 		}, 10000);
-		
+
 		try {
 			const response = await getResponse(controller);
 
