@@ -114,7 +114,7 @@ async function fetch(id: string) {
 		let shouldSkip = false;
 
 		if (isFetched === false) {
-			const rows = await knex(TableName.TWITTER_TWEETS).select('id').orderByRaw('length(id)').limit(1);
+			const rows = await knex(TableName.TWITTER_TWEETS).select('id').orderByRaw('length(id), id').limit(1);
 			if (rows.length > 0) {
 				maxId = rows[0].id;
 			}
