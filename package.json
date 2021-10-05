@@ -14,6 +14,8 @@
     "ts-node": "ts-node -r tsconfig-paths/register",
     "start:dev": "npm run ts-node ./src/index.ts",
     "fetch": "npm run ts-node ./src/fetch.ts",
+    "fetch:2": "npm run ts-node ./src/fetch_2.ts",
+    "fetch:3": "npm run ts-node ./src/fetch_3.ts",
     "download": "npm run ts-node ./src/download.ts",
     "artist": "npm run ts-node ./src/artist.ts",
     "gif": "npm run ts-node ./src/gif.ts"
